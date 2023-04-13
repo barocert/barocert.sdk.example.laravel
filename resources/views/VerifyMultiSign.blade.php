@@ -12,13 +12,13 @@
         <legend>{{\Request::fullUrl()}}</legend>
         <ul>
             <li>접수 아이디 (ReceiptID) : {{ $result->receiptID }}</li>
-            <li>요청 아이디 (RequestID) : {{ $result->requestID }}</li>
+            
 
             <?php
-                for ($i = 0; $i < Count($result->bulkSignedData); $i++) {
+                for ($i = 0; $i < Count($result->multiSignedData); $i++) {
             ?>
 
-                <li>전자서명 데이터 전문 (BulkSignedData) : {{ $result->bulkSignedData[$i] }}</li>
+                <li>전자서명 데이터 전문 (multiSignedData) : {{ $result->multiSignedData[$i] }}</li>
 
             <?php
                 }

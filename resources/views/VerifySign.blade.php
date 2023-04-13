@@ -12,7 +12,6 @@
         <legend>{{\Request::fullUrl()}}</legend>
         <ul>
             <li>접수 아이디 (ReceiptID) : {{ $result->receiptID }}</li>
-            <li>요청 아이디 (RequestID) : {{ $result->requestID }}</li>
             <li>전자서명 데이터 (signedData) : {{ $result->signedData }}</li>
             <li>연계정보 (Ci) : {{ $result->ci }}</li>
         </ul>

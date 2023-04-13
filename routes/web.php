@@ -17,4 +17,4 @@ Route::get('/', function () {
     return view('index');
 });
 
-Route::get('/Kakaocert/{APIName}','KakaocertController@RouteHandelerFunc');
+Route::get('/KakaocertService/{APIName}','KakaocertController@RouteHandelerFunc');

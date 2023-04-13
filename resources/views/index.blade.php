@@ -9,28 +9,31 @@
     <p class="heading1">Barocert Kakao Service PHP Laravel Example.</p>
     <br/>
     <fieldset class="fieldset1">
-        <legend>전자서명 API</legend>
+        <legend>Kakaocert 본인인증 API</legend>
         <ul>
-            <li><a href="Kakaocert/requestESign">RequestESign</a> -전자서명 요청(단건)</li>
-            <li><a href="Kakaocert/bulkRequestESign">BulkRequestESign</a> -전자서명 요청(다건)</li>
-            <li><a href="Kakaocert/getESignState">GetESignState</a> -전자서명 상태확인(단건)</li>
-            <li><a href="Kakaocert/getBulkESignState">GetBulkESignState</a> -전자서명 상태확인(다건)</li>
-            <li><a href="Kakaocert/verifyESign">VerifyESign</a> -전자서명 검증(단건)</li>
-            <li><a href="Kakaocert/bulkVerifyESign">BulkVerifyESign</a> -전자서명 검증(다건)</li>
+            <li><a href="KakaocertService/RequestIdentity">RequestIdentity</a> - 본인인증 요청</li>
+            <li><a href="KakaocertService/GetIdentityStatus">GetIdentityStatus</a> - 본인인증 상태확인</li>
+            <li><a href="KakaocertService/VerifyIdentity">VerifyIdentity</a> - 본인인증 검증</li>
         </ul>
-
-        <legend>본인인증 API</legend>
+    </fieldset>
+    
+    <fieldset class="fieldset1">
+        <legend>Kakaocert 전자서명 API</legend>
         <ul>
-            <li><a href="Kakaocert/requestVerifyAuth">RequestVerifyAuth</a> - 본인인증 요청</li>
-            <li><a href="Kakaocert/getVerifyAuthState">GetVerifyAuthState</a> - 본인인증 상태확인</li>
-            <li><a href="Kakaocert/verifyAuth">VerifyAuth</a> - 본인인증 검증</li>
+            <li><a href="KakaocertService/RequestSign">RequestSign</a> - 전자서명 요청(단건)</li>
+            <li><a href="KakaocertService/GetSignStatus">GetSignStatus</a> - 전자서명 상태확인(단건)</li>
+            <li><a href="KakaocertService/VerifySign">VerifySign</a> - 전자서명 검증(단건)</li>
+            <li><a href="KakaocertService/RequestMultiSign">RequestMultiSign</a> - 전자서명 요청(복수)</li>
+            <li><a href="KakaocertService/GetMultiSignStatus">GetMultiSignStatus</a> - 전자서명 상태확인(복수)</li>
+            <li><a href="KakaocertService/VerifyMultiSign">VerifyMultiSign</a> - 전자서명 검증(복수)</li>
         </ul>
-
-        <legend>출금동의 API</legend>
+    </fieldset>
+    <fieldset class="fieldset1">
+        <legend>Kakaocert 출금동의 API</legend>
         <ul>
-            <li><a href="Kakaocert/requestCMS">RequestCMS</a> - 출금동의 요청</li>
-            <li><a href="Kakaocert/getCMSState">GetCMSState</a> - 출금동의 상태확인</li>
-            <li><a href="Kakaocert/verifyCMS">VerifyCMS</a> - 출금동의 검증</li>
+            <li><a href="KakaocertService/RequestCMS">RequestCMS</a> - 출금동의 요청</li>
+            <li><a href="KakaocertService/GetCMSStatus">GetCMSStatus</a> - 출금동의 상태확인</li>
+            <li><a href="KakaocertService/verifyCMS">VerifyCMS</a> - 출금동의 검증</li>
         </ul>
     </fieldset>
 </div>

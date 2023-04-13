@@ -11,10 +11,8 @@
     <fieldset class="fieldset1">
         <legend>{{\Request::fullUrl()}}</legend>
         <ul>
-            <li>접수 아이디 (ReceiptID) : {{ $result->receiptID }}</li>
-            <li>상태 (State) : {{ $result->state }}</li>
-            <li>전자서명 데이터 (signedData) : {{ $result->signedData }}</li>
-            <li>연계정보 (Ci) : {{ $result->ci }}</li>
+            <li>접수아이디 (receiptID) : {{ $result->receiptID }}</li>
+            <li>앱스킴 (scheme): {{ $result->scheme }}</li>
         </ul>
     </fieldset>
 </div>
