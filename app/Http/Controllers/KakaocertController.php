@@ -7,13 +7,13 @@ use Illuminate\Http\Request;
 use Linkhub\LinkhubException;
 use App\Library\BarocertException;
 use App\Library\KakaocertService;
-use App\Library\RequestSign;
+use App\Library\Sign;
 use App\Library\GetSignStatus;
 use App\Library\RequestIdentity;
-use App\Library\RequestMultiSign;
+use App\Library\MultiSign;
 use App\Library\GetCMSState;
 use App\Library\MultiSignTokens;
-use App\Library\RequestCMS;
+use App\Library\CMS;
 
 class KakaocertController extends Controller
 {
@@ -50,32 +50,32 @@ class KakaocertController extends Controller
     $clientCode = '023030000004';
 
     // 본인인증 요청정보 객체
-    $RequestIdentity = new RequestIdentity();
+    $Identity = new Identity();
 
     // 수신자 정보
     // 휴대폰번호,성명,생년월일 또는 Ci(연계정보)값 중 택 일
-    $RequestIdentity->receiverHP = $this->KakaocertService->encrypt('01054437896');
-    $RequestIdentity->receiverName = $this->KakaocertService->encrypt('최상혁');
-    $RequestIdentity->receiverBirthday = $this->KakaocertService->encrypt('19880301');
-    // $RequestIdentity->ci = $KakaocertService->encrypt('');
+    $Identity->receiverHP = $this->KakaocertService->encrypt('01054437896');
+    $Identity->receiverName = $this->KakaocertService->encrypt('최상혁');
+    $Identity->receiverBirthday = $this->KakaocertService->encrypt('19880301');
+    // $Identity->ci = $KakaocertService->encrypt('');
     
     // 인증요청 메시지 제목 - 최대 40자
-    $RequestIdentity->reqTitle = '인증요청 메시지 제목란';
+    $Identity->reqTitle = '인증요청 메시지 제목란';
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
-    $RequestIdentity->expireIn = 1000;
+    $Identity->expireIn = 1000;
     // 서명 원문 - 최대 2,800자 까지 입력가능
-    $RequestIdentity->token = $this->KakaocertService->encrypt('본인인증요청토큰');
+    $Identity->token = $this->KakaocertService->encrypt('본인인증요청토큰');
 
 
     // AppToApp 인증요청 여부
     // true - AppToApp 인증방식, false - Talk Message 인증방식
-    $RequestIdentity->appUseYN = false;
+    $Identity->appUseYN = false;
 
     // App to App 방식 이용시, 에러시 호출할 URL
-    // $RequestIdentity->returnURL = 'https://kakao.barocert.com';
+    // $Identity->returnURL = 'https://kakao.barocert.com';
 
     try {
-      $result = $this->KakaocertService->requestIdentity($clientCode, $RequestIdentity);
+      $result = $this->KakaocertService->requestIdentity($clientCode, $Identity);
     }
     catch(BarocertException $re) {
       $code = $re->getCode();
@@ -83,7 +83,7 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('RequestIdentity', ['result' => $result]);
+    return view('Identity', ['result' => $result]);
   }
 
   
@@ -144,34 +144,34 @@ class KakaocertController extends Controller
     $clientCode = '023030000004';
 
     // 전자서명 요청정보 객체
-    $RequestSign = new RequestSign();
+    $Sign = new Sign();
 
     // 수신자 정보
     // 휴대폰번호,성명,생년월일 또는 Ci(연계정보)값 중 택 일
-    $RequestSign->receiverHP = $this->KakaocertService->encrypt('01054437896');
-    $RequestSign->receiverName = $this->KakaocertService->encrypt('최상혁');
-    $RequestSign->receiverBirthday = $this->KakaocertService->encrypt('19880301');
-    // $RequestSign->ci = $KakaocertService->encrypt('');
+    $Sign->receiverHP = $this->KakaocertService->encrypt('01054437896');
+    $Sign->receiverName = $this->KakaocertService->encrypt('최상혁');
+    $Sign->receiverBirthday = $this->KakaocertService->encrypt('19880301');
+    // $Sign->ci = $KakaocertService->encrypt('');
 
     // 인증요청 메시지 제목 - 최대 40자
-    $RequestSign->reqTitle = '전자서명단건테스트';
+    $Sign->reqTitle = '전자서명단건테스트';
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
-    $RequestSign->expireIn = 1000;
+    $Sign->expireIn = 1000;
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $RequestSign->token = $this->KakaocertService->encrypt('전자서명단건테스트데이터');
+    $Sign->token = $this->KakaocertService->encrypt('전자서명단건테스트데이터');
     // 서명 원문 유형
     // TEXT - 일반 텍스트, HASH - HASH 데이터
-    $RequestSign->tokenType = 'TEXT'; // TEXT, HASH
+    $Sign->tokenType = 'TEXT'; // TEXT, HASH
 
     // AppToApp 인증요청 여부
     // true - AppToApp 인증방식, false - Talk Message 인증방식
-    $RequestSign->appUseYN = false;
+    $Sign->appUseYN = false;
 
     // App to App 방식 이용시, 에러시 호출할 URL
-    // $RequestSign->returnURL = 'https://kakao.barocert.com';
+    // $Sign->returnURL = 'https://kakao.barocert.com';
 
     try {
-      $result = $this->KakaocertService->requestSign($clientCode, $RequestSign);
+      $result = $this->KakaocertService->requestSign($clientCode, $Sign);
     }
     catch(BarocertException $re) {
       $code = $re->getCode();
@@ -179,7 +179,7 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('RequestSign', ['result' => $result]);
+    return view('Sign', ['result' => $result]);
   }
 
   /*
@@ -238,49 +238,49 @@ class KakaocertController extends Controller
     $clientCode = '023030000004';
 
     // 전자서명 요청정보 객체
-    $RequestMultiSign = new RequestMultiSign();
+    $MultiSign = new MultiSign();
 
     // 수신자 정보
     // 휴대폰번호,성명,생년월일 또는 Ci(연계정보)값 중 택 일
-    $RequestMultiSign->receiverHP = $this->KakaocertService->encrypt('01054437896');
-    $RequestMultiSign->receiverName = $this->KakaocertService->encrypt('최상혁');
-    $RequestMultiSign->receiverBirthday = $this->KakaocertService->encrypt('19880301');
-    // $RequestMultiSign->ci = $KakaocertService->encrypt('');
+    $MultiSign->receiverHP = $this->KakaocertService->encrypt('01054437896');
+    $MultiSign->receiverName = $this->KakaocertService->encrypt('최상혁');
+    $MultiSign->receiverBirthday = $this->KakaocertService->encrypt('19880301');
+    // $MultiSign->ci = $KakaocertService->encrypt('');
 
       // 인증요청 메시지 제목 - 최대 40자
-    $RequestMultiSign->reqTitle = '전자서명단건테스트';
+    $MultiSign->reqTitle = '전자서명단건테스트';
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
-    $RequestMultiSign->expireIn = 1000;
+    $MultiSign->expireIn = 1000;
 
     // 개별문서 등록 - 최대 20 건
     // 개별 요청 정보 객체
-    $RequestMultiSign->tokens = array();
+    $MultiSign->tokens = array();
     
-    $RequestMultiSign->tokens[] = new MultiSignTokens();
+    $MultiSign->tokens[] = new MultiSignTokens();
     // 인증요청 메시지 제목 - 최대 40자
-    $RequestMultiSign->tokens[0]->reqTitle = "전자서명복수문서테스트1";
+    $MultiSign->tokens[0]->reqTitle = "전자서명복수문서테스트1";
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $RequestMultiSign->tokens[0]->token = $this->KakaocertService->encrypt("전자서명복수테스트데이터1");
+    $MultiSign->tokens[0]->token = $this->KakaocertService->encrypt("전자서명복수테스트데이터1");
 
-    $RequestMultiSign->tokens[] = new MultiSignTokens();
+    $MultiSign->tokens[] = new MultiSignTokens();
     // 인증요청 메시지 제목 - 최대 40자
-    $RequestMultiSign->tokens[1]->reqTitle = "전자서명복수문서테스트2";
+    $MultiSign->tokens[1]->reqTitle = "전자서명복수문서테스트2";
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $RequestMultiSign->tokens[1]->token = $this->KakaocertService->encrypt("전자서명복수테스트데이터2");
+    $MultiSign->tokens[1]->token = $this->KakaocertService->encrypt("전자서명복수테스트데이터2");
 
     // 서명 원문 유형
     // TEXT - 일반 텍스트, HASH - HASH 데이터
-    $RequestMultiSign->tokenType = 'TEXT'; // TEXT, HASH
+    $MultiSign->tokenType = 'TEXT'; // TEXT, HASH
 
     // AppToApp 인증요청 여부
     // true - AppToApp 인증방식, false - Talk Message 인증방식
-    $RequestMultiSign->appUseYN = false;
+    $MultiSign->appUseYN = false;
 
     // App to App 방식 이용시, 에러시 호출할 URL
-    // $RequestMultiSign->returnURL = 'https://kakao.barocert.com';
+    // $MultiSign->returnURL = 'https://kakao.barocert.com';
 
     try {
-      $result = $this->KakaocertService->requestMultiSign($clientCode, $RequestMultiSign);
+      $result = $this->KakaocertService->requestMultiSign($clientCode, $MultiSign);
     }
     catch(BarocertException $re) {
       $code = $re->getCode();
@@ -288,7 +288,7 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('RequestMultiSign', ['result' => $result]);
+    return view('MultiSign', ['result' => $result]);
   }
 
   /*
@@ -351,42 +351,42 @@ class KakaocertController extends Controller
       $clientCode = '023030000004';
 
       // 출금동의 요청 정보 객체
-      $RequestCMS = new RequestCMS();
+      $CMS = new CMS();
 
       // 수신자 정보
       // 휴대폰번호,성명,생년월일 또는 Ci(연계정보)값 중 택 일
-      $RequestCMS->receiverHP = $this->KakaocertService->encrypt('01054437896');
-      $RequestCMS->receiverName = $this->KakaocertService->encrypt('최상혁');
-      $RequestCMS->receiverBirthday = $this->KakaocertService->encrypt('19880301');
-      // $RequestCMS->ci = KakaocertService::encrypt('');;
+      $CMS->receiverHP = $this->KakaocertService->encrypt('01054437896');
+      $CMS->receiverName = $this->KakaocertService->encrypt('최상혁');
+      $CMS->receiverBirthday = $this->KakaocertService->encrypt('19880301');
+      // $CMS->ci = KakaocertService::encrypt('');;
 
       // 인증요청 메시지 제목 - 최대 40자
-      $RequestCMS->reqTitle = '인증요청 메시지 제공란';
+      $CMS->reqTitle = '인증요청 메시지 제공란';
       // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
-      $RequestCMS->expireIn = 1000;
+      $CMS->expireIn = 1000;
       // 청구기관명 - 최대 100자
-      $RequestCMS->requestCorp = $this->KakaocertService->encrypt('청구 기관명란');
+      $CMS->requestCorp = $this->KakaocertService->encrypt('청구 기관명란');
       // 출금은행명 - 최대 100자
-      $RequestCMS->bankName = $this->KakaocertService->encrypt('출금은행명란');
+      $CMS->bankName = $this->KakaocertService->encrypt('출금은행명란');
       // 출금계좌번호 - 최대 32자
-      $RequestCMS->bankAccountNum = $this->KakaocertService->encrypt('9-4324-5117-58');
+      $CMS->bankAccountNum = $this->KakaocertService->encrypt('9-4324-5117-58');
       // 출금계좌 예금주명 - 최대 100자
-      $RequestCMS->bankAccountName = $this->KakaocertService->encrypt('예금주명 입력란');
+      $CMS->bankAccountName = $this->KakaocertService->encrypt('예금주명 입력란');
       // 출금계좌 예금주 생년월일 - 8자
-      $RequestCMS->bankAccountBirthday = $this->KakaocertService->encrypt('19880301');
+      $CMS->bankAccountBirthday = $this->KakaocertService->encrypt('19880301');
       // 출금유형
       // CMS - 출금동의용, FIRM - 펌뱅킹, GIRO - 지로용
-      $RequestCMS->bankServiceType = $this->KakaocertService->encrypt('CMS'); // CMS, FIRM, GIRO
+      $CMS->bankServiceType = $this->KakaocertService->encrypt('CMS'); // CMS, FIRM, GIRO
 
       // AppToApp 인증요청 여부
       // true - AppToApp 인증방식, false - Talk Message 인증방식
-      $RequestCMS->appUseYN = false; 
+      $CMS->appUseYN = false; 
 
       // App to App 방식 이용시, 에러시 호출할 URL
-      // $RequestCMS->returnURL = 'https://kakao.barocert.com';
+      // $CMS->returnURL = 'https://kakao.barocert.com';
 
     try {
-        $result = $this->KakaocertService->requestCMS($clientCode, $RequestCMS);
+        $result = $this->KakaocertService->requestCMS($clientCode, $CMS);
     }
     catch(BarocertException $re) {
         $code = $re->getCode();
@@ -394,7 +394,7 @@ class KakaocertController extends Controller
         return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('RequestCMS', ['result' => $result]);
+    return view('CMS', ['result' => $result]);
   }
 
   /*
