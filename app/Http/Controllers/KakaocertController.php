@@ -5,15 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use Linkhub\LinkhubException;
-use App\Library\BarocertException;
-use App\Library\KakaocertService;
-use App\Library\Sign;
-use App\Library\GetSignStatus;
-use App\Library\RequestIdentity;
-use App\Library\MultiSign;
-use App\Library\GetCMSState;
-use App\Library\MultiSignTokens;
-use App\Library\CMS;
+use Linkhub\Barocert\BarocertException;
+use Linkhub\Barocert\KakaocertService;
+use Linkhub\Barocert\Sign;
+use Linkhub\Barocert\GetSignStatus;
+use Linkhub\Barocert\Identity;
+use Linkhub\Barocert\MultiSign;
+use Linkhub\Barocert\GetCMSState;
+use Linkhub\Barocert\MultiSignTokens;
+use Linkhub\Barocert\CMS;
 
 class KakaocertController extends Controller
 {
@@ -83,7 +83,7 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('Identity', ['result' => $result]);
+    return view('RequestIdentity', ['result' => $result]);
   }
 
   
@@ -179,7 +179,7 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('Sign', ['result' => $result]);
+    return view('RequestSign', ['result' => $result]);
   }
 
   /*
@@ -288,7 +288,7 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('MultiSign', ['result' => $result]);
+    return view('RequestMultiSign', ['result' => $result]);
   }
 
   /*
@@ -394,7 +394,7 @@ class KakaocertController extends Controller
         return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('CMS', ['result' => $result]);
+    return view('RequestCMS', ['result' => $result]);
   }
 
   /*

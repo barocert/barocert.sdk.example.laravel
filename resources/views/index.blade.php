@@ -20,10 +20,10 @@
     <fieldset class="fieldset1">
         <legend>Kakaocert 전자서명 API</legend>
         <ul>
-            <li><a href="KakaocertService/Sign">Sign</a> - 전자서명 요청(단건)</li>
+            <li><a href="KakaocertService/RequestSign">RequestSign</a> - 전자서명 요청(단건)</li>
             <li><a href="KakaocertService/GetSignStatus">GetSignStatus</a> - 전자서명 상태확인(단건)</li>
             <li><a href="KakaocertService/VerifySign">VerifySign</a> - 전자서명 검증(단건)</li>
-            <li><a href="KakaocertService/MultiSign">MultiSign</a> - 전자서명 요청(복수)</li>
+            <li><a href="KakaocertService/RequestMultiSign">RequestMultiSign</a> - 전자서명 요청(복수)</li>
             <li><a href="KakaocertService/GetMultiSignStatus">GetMultiSignStatus</a> - 전자서명 상태확인(복수)</li>
             <li><a href="KakaocertService/VerifyMultiSign">VerifyMultiSign</a> - 전자서명 검증(복수)</li>
         </ul>
@@ -31,7 +31,7 @@
     <fieldset class="fieldset1">
         <legend>Kakaocert 출금동의 API</legend>
         <ul>
-            <li><a href="KakaocertService/CMS">CMS</a> - 출금동의 요청</li>
+            <li><a href="KakaocertService/RequestCMS">RequestCMS</a> - 출금동의 요청</li>
             <li><a href="KakaocertService/GetCMSStatus">GetCMSStatus</a> - 출금동의 상태확인</li>
             <li><a href="KakaocertService/verifyCMS">VerifyCMS</a> - 출금동의 검증</li>
         </ul>
