@@ -54,9 +54,9 @@ class KakaocertController extends Controller
 
     // 수신자 정보
     // 휴대폰번호,성명,생년월일 또는 Ci(연계정보)값 중 택 일
-    $Identity->receiverHP = $this->KakaocertService->encrypt('01054437896');
-    $Identity->receiverName = $this->KakaocertService->encrypt('최상혁');
-    $Identity->receiverBirthday = $this->KakaocertService->encrypt('19880301');
+    $Identity->receiverHP = $this->KakaocertService->encrypt('01012341234');
+    $Identity->receiverName = $this->KakaocertService->encrypt('홍길동');
+    $Identity->receiverBirthday = $this->KakaocertService->encrypt('19700101');
     // $Identity->ci = $KakaocertService->encrypt('');
     
     // 인증요청 메시지 제목 - 최대 40자
@@ -148,9 +148,9 @@ class KakaocertController extends Controller
 
     // 수신자 정보
     // 휴대폰번호,성명,생년월일 또는 Ci(연계정보)값 중 택 일
-    $Sign->receiverHP = $this->KakaocertService->encrypt('01054437896');
-    $Sign->receiverName = $this->KakaocertService->encrypt('최상혁');
-    $Sign->receiverBirthday = $this->KakaocertService->encrypt('19880301');
+    $Sign->receiverHP = $this->KakaocertService->encrypt('01012341234');
+    $Sign->receiverName = $this->KakaocertService->encrypt('홍길동');
+    $Sign->receiverBirthday = $this->KakaocertService->encrypt('19700101');
     // $Sign->ci = $KakaocertService->encrypt('');
 
     // 인증요청 메시지 제목 - 최대 40자
@@ -242,9 +242,9 @@ class KakaocertController extends Controller
 
     // 수신자 정보
     // 휴대폰번호,성명,생년월일 또는 Ci(연계정보)값 중 택 일
-    $MultiSign->receiverHP = $this->KakaocertService->encrypt('01054437896');
-    $MultiSign->receiverName = $this->KakaocertService->encrypt('최상혁');
-    $MultiSign->receiverBirthday = $this->KakaocertService->encrypt('19880301');
+    $MultiSign->receiverHP = $this->KakaocertService->encrypt('01012341234');
+    $MultiSign->receiverName = $this->KakaocertService->encrypt('홍길동');
+    $MultiSign->receiverBirthday = $this->KakaocertService->encrypt('19700101');
     // $MultiSign->ci = $KakaocertService->encrypt('');
 
       // 인증요청 메시지 제목 - 최대 40자
@@ -355,9 +355,9 @@ class KakaocertController extends Controller
 
       // 수신자 정보
       // 휴대폰번호,성명,생년월일 또는 Ci(연계정보)값 중 택 일
-      $CMS->receiverHP = $this->KakaocertService->encrypt('01054437896');
-      $CMS->receiverName = $this->KakaocertService->encrypt('최상혁');
-      $CMS->receiverBirthday = $this->KakaocertService->encrypt('19880301');
+      $CMS->receiverHP = $this->KakaocertService->encrypt('01012341234');
+      $CMS->receiverName = $this->KakaocertService->encrypt('홍길동');
+      $CMS->receiverBirthday = $this->KakaocertService->encrypt('19700101');
       // $CMS->ci = KakaocertService::encrypt('');;
 
       // 인증요청 메시지 제목 - 최대 40자
@@ -373,7 +373,7 @@ class KakaocertController extends Controller
       // 출금계좌 예금주명 - 최대 100자
       $CMS->bankAccountName = $this->KakaocertService->encrypt('예금주명 입력란');
       // 출금계좌 예금주 생년월일 - 8자
-      $CMS->bankAccountBirthday = $this->KakaocertService->encrypt('19880301');
+      $CMS->bankAccountBirthday = $this->KakaocertService->encrypt('19700101');
       // 출금유형
       // CMS - 출금동의용, FIRM - 펌뱅킹, GIRO - 지로용
       $CMS->bankServiceType = $this->KakaocertService->encrypt('CMS'); // CMS, FIRM, GIRO
