@@ -7,13 +7,13 @@ use Illuminate\Http\Request;
 use Linkhub\LinkhubException;
 use Linkhub\Barocert\BarocertException;
 use Linkhub\Barocert\KakaocertService;
-use Linkhub\Barocert\Sign;
-use Linkhub\Barocert\GetSignStatus;
-use Linkhub\Barocert\Identity;
-use Linkhub\Barocert\MultiSign;
-use Linkhub\Barocert\GetCMSState;
-use Linkhub\Barocert\MultiSignTokens;
-use Linkhub\Barocert\CMS;
+use Linkhub\Barocert\KakaoSign;
+use Linkhub\Barocert\KakaoGetSignStatus;
+use Linkhub\Barocert\KakaoIdentity;
+use Linkhub\Barocert\KakaoMultiSign;
+use Linkhub\Barocert\KakaoGetCMSState;
+use Linkhub\Barocert\KakaoMultiSignTokens;
+use Linkhub\Barocert\KakaoCMS;
 
 class KakaocertController extends Controller
 {
@@ -50,32 +50,32 @@ class KakaocertController extends Controller
     $clientCode = '023030000004';
 
     // 본인인증 요청정보 객체
-    $Identity = new Identity();
+    $KakaoIdentity = new KakaoIdentity();
 
     // 수신자 정보
     // 휴대폰번호,성명,생년월일 또는 Ci(연계정보)값 중 택 일
-    $Identity->receiverHP = $this->KakaocertService->encrypt('01054437896');
-    $Identity->receiverName = $this->KakaocertService->encrypt('최상혁');
-    $Identity->receiverBirthday = $this->KakaocertService->encrypt('19880301');
-    // $Identity->ci = $KakaocertService->encrypt('');
+    $KakaoIdentity->receiverHP = $this->KakaocertService->encrypt('01012341234');
+    $KakaoIdentity->receiverName = $this->KakaocertService->encrypt('홍길동');
+    $KakaoIdentity->receiverBirthday = $this->KakaocertService->encrypt('19700101');
+    // $KakaoIdentity->ci = $KakaocertService->encrypt('');
     
     // 인증요청 메시지 제목 - 최대 40자
-    $Identity->reqTitle = '인증요청 메시지 제목란';
+    $KakaoIdentity->reqTitle = '인증요청 메시지 제목란';
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
-    $Identity->expireIn = 1000;
+    $KakaoIdentity->expireIn = 1000;
     // 서명 원문 - 최대 2,800자 까지 입력가능
-    $Identity->token = $this->KakaocertService->encrypt('본인인증요청토큰');
+    $KakaoIdentity->token = $this->KakaocertService->encrypt('본인인증요청토큰');
 
 
     // AppToApp 인증요청 여부
     // true - AppToApp 인증방식, false - Talk Message 인증방식
-    $Identity->appUseYN = false;
+    $KakaoIdentity->appUseYN = false;
 
     // App to App 방식 이용시, 에러시 호출할 URL
-    // $Identity->returnURL = 'https://kakao.barocert.com';
+    // $KakaoIdentity->returnURL = 'https://kakao.barocert.com';
 
     try {
-      $result = $this->KakaocertService->requestIdentity($clientCode, $Identity);
+      $result = $this->KakaocertService->requestIdentity($clientCode, $KakaoIdentity);
     }
     catch(BarocertException $re) {
       $code = $re->getCode();
@@ -96,7 +96,7 @@ class KakaocertController extends Controller
     $clientCode = '023030000004';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02304130230300000040000000000025';
+    $receiptID = '02305080230300000040000000000014';
 
     try {
       $result = $this->KakaocertService->getIdentityStatus($clientCode, $receiptID);
@@ -120,7 +120,7 @@ class KakaocertController extends Controller
     $clientCode = '023030000004';
 
     // 본인인증 요청시 반환된 접수아이디
-    $receiptID = '02304130230300000040000000000025';
+    $receiptID = '02305080230300000040000000000014';
 
     try {
       $result = $this->KakaocertService->verifyIdentity($clientCode, $receiptID);
@@ -144,34 +144,34 @@ class KakaocertController extends Controller
     $clientCode = '023030000004';
 
     // 전자서명 요청정보 객체
-    $Sign = new Sign();
+    $KakaoSign = new KakaoSign();
 
     // 수신자 정보
     // 휴대폰번호,성명,생년월일 또는 Ci(연계정보)값 중 택 일
-    $Sign->receiverHP = $this->KakaocertService->encrypt('01054437896');
-    $Sign->receiverName = $this->KakaocertService->encrypt('최상혁');
-    $Sign->receiverBirthday = $this->KakaocertService->encrypt('19880301');
-    // $Sign->ci = $KakaocertService->encrypt('');
+    $KakaoSign->receiverHP = $this->KakaocertService->encrypt('01012341234');
+    $KakaoSign->receiverName = $this->KakaocertService->encrypt('홍길동');
+    $KakaoSign->receiverBirthday = $this->KakaocertService->encrypt('19700101');
+    // $KakaoSign->ci = $KakaocertService->encrypt('');
 
     // 인증요청 메시지 제목 - 최대 40자
-    $Sign->reqTitle = '전자서명단건테스트';
+    $KakaoSign->reqTitle = '전자서명단건테스트';
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
-    $Sign->expireIn = 1000;
+    $KakaoSign->expireIn = 1000;
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $Sign->token = $this->KakaocertService->encrypt('전자서명단건테스트데이터');
+    $KakaoSign->token = $this->KakaocertService->encrypt('전자서명단건테스트데이터');
     // 서명 원문 유형
     // TEXT - 일반 텍스트, HASH - HASH 데이터
-    $Sign->tokenType = 'TEXT'; // TEXT, HASH
+    $KakaoSign->tokenType = 'TEXT'; // TEXT, HASH
 
     // AppToApp 인증요청 여부
     // true - AppToApp 인증방식, false - Talk Message 인증방식
-    $Sign->appUseYN = false;
+    $KakaoSign->appUseYN = false;
 
     // App to App 방식 이용시, 에러시 호출할 URL
-    // $Sign->returnURL = 'https://kakao.barocert.com';
+    // $KakaoSign->returnURL = 'https://kakao.barocert.com';
 
     try {
-      $result = $this->KakaocertService->requestSign($clientCode, $Sign);
+      $result = $this->KakaocertService->requestSign($clientCode, $KakaoSign);
     }
     catch(BarocertException $re) {
       $code = $re->getCode();
@@ -191,7 +191,7 @@ class KakaocertController extends Controller
     $clientCode = '023030000004';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02304130230300000040000000000024';
+    $receiptID = '02305080230300000040000000000015';
 
     try {
       $result = $this->KakaocertService->getSignStatus($clientCode, $receiptID);
@@ -215,7 +215,7 @@ class KakaocertController extends Controller
     $clientCode = '023030000004';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02304130230300000040000000000024';
+    $receiptID = '02305080230300000040000000000015';
 
     try {
       $result = $this->KakaocertService->VerifySign($clientCode, $receiptID);
@@ -238,49 +238,49 @@ class KakaocertController extends Controller
     $clientCode = '023030000004';
 
     // 전자서명 요청정보 객체
-    $MultiSign = new MultiSign();
+    $KakaoMultiSign = new KakaoMultiSign();
 
     // 수신자 정보
     // 휴대폰번호,성명,생년월일 또는 Ci(연계정보)값 중 택 일
-    $MultiSign->receiverHP = $this->KakaocertService->encrypt('01054437896');
-    $MultiSign->receiverName = $this->KakaocertService->encrypt('최상혁');
-    $MultiSign->receiverBirthday = $this->KakaocertService->encrypt('19880301');
-    // $MultiSign->ci = $KakaocertService->encrypt('');
+    $KakaoMultiSign->receiverHP = $this->KakaocertService->encrypt('01012341234');
+    $KakaoMultiSign->receiverName = $this->KakaocertService->encrypt('홍길동');
+    $KakaoMultiSign->receiverBirthday = $this->KakaocertService->encrypt('19700101');
+    // $KakaoMultiSign->ci = $KakaocertService->encrypt('');
 
       // 인증요청 메시지 제목 - 최대 40자
-    $MultiSign->reqTitle = '전자서명단건테스트';
+    $KakaoMultiSign->reqTitle = '전자서명단건테스트';
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
-    $MultiSign->expireIn = 1000;
+    $KakaoMultiSign->expireIn = 1000;
 
     // 개별문서 등록 - 최대 20 건
     // 개별 요청 정보 객체
-    $MultiSign->tokens = array();
+    $KakaoMultiSign->tokens = array();
     
-    $MultiSign->tokens[] = new MultiSignTokens();
+    $KakaoMultiSign->tokens[] = new KakaoMultiSignTokens();
     // 인증요청 메시지 제목 - 최대 40자
-    $MultiSign->tokens[0]->reqTitle = "전자서명복수문서테스트1";
+    $KakaoMultiSign->tokens[0]->reqTitle = "전자서명복수문서테스트1";
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $MultiSign->tokens[0]->token = $this->KakaocertService->encrypt("전자서명복수테스트데이터1");
+    $KakaoMultiSign->tokens[0]->token = $this->KakaocertService->encrypt("전자서명복수테스트데이터1");
 
-    $MultiSign->tokens[] = new MultiSignTokens();
+    $KakaoMultiSign->tokens[] = new KakaoMultiSignTokens();
     // 인증요청 메시지 제목 - 최대 40자
-    $MultiSign->tokens[1]->reqTitle = "전자서명복수문서테스트2";
+    $KakaoMultiSign->tokens[1]->reqTitle = "전자서명복수문서테스트2";
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $MultiSign->tokens[1]->token = $this->KakaocertService->encrypt("전자서명복수테스트데이터2");
+    $KakaoMultiSign->tokens[1]->token = $this->KakaocertService->encrypt("전자서명복수테스트데이터2");
 
     // 서명 원문 유형
     // TEXT - 일반 텍스트, HASH - HASH 데이터
-    $MultiSign->tokenType = 'TEXT'; // TEXT, HASH
+    $KakaoMultiSign->tokenType = 'TEXT'; // TEXT, HASH
 
     // AppToApp 인증요청 여부
     // true - AppToApp 인증방식, false - Talk Message 인증방식
-    $MultiSign->appUseYN = false;
+    $KakaoMultiSign->appUseYN = false;
 
     // App to App 방식 이용시, 에러시 호출할 URL
-    // $MultiSign->returnURL = 'https://kakao.barocert.com';
+    // $KakaoMultiSign->returnURL = 'https://kakao.barocert.com';
 
     try {
-      $result = $this->KakaocertService->requestMultiSign($clientCode, $MultiSign);
+      $result = $this->KakaocertService->requestMultiSign($clientCode, $KakaoMultiSign);
     }
     catch(BarocertException $re) {
       $code = $re->getCode();
@@ -300,7 +300,7 @@ class KakaocertController extends Controller
     $clientCode = '023030000004';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02304130230300000040000000000024';
+    $receiptID = '02305080230300000040000000000016';
 
     try {
       $result = $this->KakaocertService->getMultiSignStatus($clientCode, $receiptID);
@@ -326,7 +326,7 @@ class KakaocertController extends Controller
     $clientCode = '023030000004';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02304130230300000040000000000018';
+    $receiptID = '02305080230300000040000000000016';
 
     try {
       $result = $this->KakaocertService->verifyMultiSign($clientCode, $receiptID);
@@ -351,42 +351,42 @@ class KakaocertController extends Controller
       $clientCode = '023030000004';
 
       // 출금동의 요청 정보 객체
-      $CMS = new CMS();
+      $KakaoCMS = new KakaoCMS();
 
       // 수신자 정보
       // 휴대폰번호,성명,생년월일 또는 Ci(연계정보)값 중 택 일
-      $CMS->receiverHP = $this->KakaocertService->encrypt('01054437896');
-      $CMS->receiverName = $this->KakaocertService->encrypt('최상혁');
-      $CMS->receiverBirthday = $this->KakaocertService->encrypt('19880301');
-      // $CMS->ci = KakaocertService::encrypt('');;
+      $KakaoCMS->receiverHP = $this->KakaocertService->encrypt('01012341234');
+      $KakaoCMS->receiverName = $this->KakaocertService->encrypt('홍길동');
+      $KakaoCMS->receiverBirthday = $this->KakaocertService->encrypt('19700101');
+      // $KakaoCMS->ci = KakaocertService::encrypt('');;
 
       // 인증요청 메시지 제목 - 최대 40자
-      $CMS->reqTitle = '인증요청 메시지 제공란';
+      $KakaoCMS->reqTitle = '인증요청 메시지 제공란';
       // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
-      $CMS->expireIn = 1000;
+      $KakaoCMS->expireIn = 1000;
       // 청구기관명 - 최대 100자
-      $CMS->requestCorp = $this->KakaocertService->encrypt('청구 기관명란');
+      $KakaoCMS->requestCorp = $this->KakaocertService->encrypt('청구 기관명란');
       // 출금은행명 - 최대 100자
-      $CMS->bankName = $this->KakaocertService->encrypt('출금은행명란');
+      $KakaoCMS->bankName = $this->KakaocertService->encrypt('출금은행명란');
       // 출금계좌번호 - 최대 32자
-      $CMS->bankAccountNum = $this->KakaocertService->encrypt('9-4324-5117-58');
+      $KakaoCMS->bankAccountNum = $this->KakaocertService->encrypt('9-4324-5117-58');
       // 출금계좌 예금주명 - 최대 100자
-      $CMS->bankAccountName = $this->KakaocertService->encrypt('예금주명 입력란');
+      $KakaoCMS->bankAccountName = $this->KakaocertService->encrypt('예금주명 입력란');
       // 출금계좌 예금주 생년월일 - 8자
-      $CMS->bankAccountBirthday = $this->KakaocertService->encrypt('19880301');
+      $KakaoCMS->bankAccountBirthday = $this->KakaocertService->encrypt('19700101');
       // 출금유형
-      // CMS - 출금동의용, FIRM - 펌뱅킹, GIRO - 지로용
-      $CMS->bankServiceType = $this->KakaocertService->encrypt('CMS'); // CMS, FIRM, GIRO
+      // KakaoCMS - 출금동의용, FIRM - 펌뱅킹, GIRO - 지로용
+      $KakaoCMS->bankServiceType = $this->KakaocertService->encrypt('CMS'); // CMS, FIRM, GIRO
 
       // AppToApp 인증요청 여부
       // true - AppToApp 인증방식, false - Talk Message 인증방식
-      $CMS->appUseYN = false; 
+      $KakaoCMS->appUseYN = false; 
 
       // App to App 방식 이용시, 에러시 호출할 URL
-      // $CMS->returnURL = 'https://kakao.barocert.com';
+      // $KakaoCMS->returnURL = 'https://kakao.barocert.com';
 
     try {
-        $result = $this->KakaocertService->requestCMS($clientCode, $CMS);
+        $result = $this->KakaocertService->requestCMS($clientCode, $KakaoCMS);
     }
     catch(BarocertException $re) {
         $code = $re->getCode();
@@ -407,7 +407,7 @@ class KakaocertController extends Controller
     $clientCode = '023030000004';
 
     // 출금동의 요청시 반환된 접수아이디
-    $receiptID = '02304130230300000040000000000020';
+    $receiptID = '02305080230300000040000000000017';
 
     try {
       $result = $this->KakaocertService->getCMSStatus($clientCode, $receiptID);
@@ -431,7 +431,7 @@ class KakaocertController extends Controller
     $clientCode = '023030000004';
 
     // 출금동의 요청시 반환된 접수아이디
-    $receiptID = '02304130230300000040000000000020';
+    $receiptID = '02305080230300000040000000000017';
 
     try {
       $result = $this->KakaocertService->verifyCMS($clientCode, $receiptID);
