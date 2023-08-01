@@ -7,37 +7,33 @@ use Illuminate\Http\Request;
 use Linkhub\LinkhubException;
 use Linkhub\Barocert\PasscertService;
 use Linkhub\Barocert\BaseService;
-use Linkhub\Barocert\PassSign;
-use Linkhub\Barocert\PassGetSignStatus;
-use Linkhub\Barocert\PassSignVerify;
 use Linkhub\Barocert\PassIdentity;
-use Linkhub\Barocert\PassGetIdentityStatus;
 use Linkhub\Barocert\PassIdentityVerify;
-use Linkhub\Barocert\PassLogin;
-use Linkhub\Barocert\PassGetLoginStatus;
-use Linkhub\Barocert\PassLoginVerify;
+use Linkhub\Barocert\PassSign;
+use Linkhub\Barocert\PassSignVerify;
 use Linkhub\Barocert\PassCMS;
-use Linkhub\Barocert\PassGetCMSState;
 use Linkhub\Barocert\PassCMSVerify;
+use Linkhub\Barocert\PassLogin;
+use Linkhub\Barocert\PassLoginVerify;
 
 class PasscertController extends Controller
 {
   public function __construct() {
 
     // 통신방식 설정
-    define('LINKHUB_COMM_MODE', config('passcert.LINKHUB_COMM_MODE'));
+    define('LINKHUB_COMM_MODE', config('barocert.LINKHUB_COMM_MODE'));
 
     // 패스써트 서비스 클래스 초기화
-    $this->PasscertService = new PasscertService(config('passcert.LinkID'), config('passcert.SecretKey'));
+    $this->PasscertService = new PasscertService(config('barocert.LinkID'), config('barocert.SecretKey'));
 
     // 인증토큰의 IP제한기능 사용여부, true-사용, false-미사용, 기본값(true)
-    $this->PasscertService->IPRestrictOnOff(config('passcert.IPRestrictOnOff'));
+    $this->PasscertService->IPRestrictOnOff(config('barocert.IPRestrictOnOff'));
 
     // 패스써트 API 서비스 고정 IP 사용여부, true-사용, false-미사용, 기본값(false)
-    $this->PasscertService->UseStaticIP(config('passcert.UseStaticIP'));
+    $this->PasscertService->UseStaticIP(config('barocert.UseStaticIP'));
 
     // 로컬시스템 시간 사용여부, true-사용, false-미사용, 기본값(true)
-    $this->PasscertService->UseLocalTimeYN(config('passcert.UseLocalTimeYN'));
+    $this->PasscertService->UseLocalTimeYN(config('barocert.UseLocalTimeYN'));
   }
 
   // HTTP Get Request URI -> 함수 라우팅 처리 함수
@@ -46,10 +42,10 @@ class PasscertController extends Controller
     return $this->$APIName();
   }
 
- /*
-  * 패스 이용자에게 본인인증을 요청합니다.
-  * https://developers.barocert.com/reference/pass/java/identity/api#RequestIdentity
-  */
+  /*
+   * 패스 이용자에게 본인인증을 요청합니다.
+   * https://developers.barocert.com/reference/pass/php/identity/api#RequestIdentity
+   */
   public function RequestIdentity(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
@@ -59,7 +55,7 @@ class PasscertController extends Controller
     $PassIdentity = new PassIdentity();
 
     // 수신자 휴대폰번호 - 11자 (하이픈 제외)
-    $PassIdentity->receiverHP = $this->PasscertService->encrypt('010012341234');
+    $PassIdentity->receiverHP = $this->PasscertService->encrypt('01012341234');
     // 수신자 성명 - 80자
     $PassIdentity->receiverName = $this->PasscertService->encrypt('홍길동');
     // 수신자 생년월일 - 8자 (yyyyMMdd)
@@ -103,12 +99,12 @@ class PasscertController extends Controller
     return view('PassCert/RequestIdentity', ['result' => $result]);
   }
 
- /*
-  * 본인인증 요청 후 반환받은 접수아이디로 본인인증 진행 상태를 확인합니다.
-  * 상태확인 함수는 본인인증 요청 함수를 호출한 당일 23시 59분 59초까지만 호출 가능합니다.
-  * 본인인증 요청 함수를 호출한 당일 23시 59분 59초 이후 상태확인 함수를 호출할 경우 오류가 반환됩니다.
-  * https://developers.barocert.com/reference/pass/java/identity/api#GetIdentityStatus
-  */
+  /*
+   * 본인인증 요청 후 반환받은 접수아이디로 본인인증 진행 상태를 확인합니다.
+   * 상태확인 함수는 본인인증 요청 함수를 호출한 당일 23시 59분 59초까지만 호출 가능합니다.
+   * 본인인증 요청 함수를 호출한 당일 23시 59분 59초 이후 상태확인 함수를 호출할 경우 오류가 반환됩니다.
+   * https://developers.barocert.com/reference/pass/php/identity/api#GetIdentityStatus
+   */
   public function GetIdentityStatus(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
@@ -129,13 +125,13 @@ class PasscertController extends Controller
     return view('PassCert/GetIdentityStatus', ['result' => $result]);
   }
 
- /*
-  * 완료된 전자서명을 검증하고 전자서명값(signedData)을 반환 받습니다.
-  * 반환받은 전자서명값(signedData)과 [1. RequestIdentity] 함수 호출에 입력한 Token의 동일 여부를 확인하여 이용자의 본인인증 검증을 완료합니다.
-  * 검증 함수는 본인인증 요청 함수를 호출한 당일 23시 59분 59초까지만 호출 가능합니다.
-  * 본인인증 요청 함수를 호출한 당일 23시 59분 59초 이후 검증 함수를 호출할 경우 오류가 반환됩니다.
-  * https://developers.barocert.com/reference/pass/java/identity/api#VerifyIdentity
-  */
+  /*
+   * 완료된 전자서명을 검증하고 전자서명값(signedData)을 반환 받습니다.
+   * 반환받은 전자서명값(signedData)과 [1. RequestIdentity] 함수 호출에 입력한 Token의 동일 여부를 확인하여 이용자의 본인인증 검증을 완료합니다.
+   * 검증 함수는 본인인증 요청 함수를 호출한 당일 23시 59분 59초까지만 호출 가능합니다.
+   * 본인인증 요청 함수를 호출한 당일 23시 59분 59초 이후 검증 함수를 호출할 경우 오류가 반환됩니다.
+   * https://developers.barocert.com/reference/pass/php/identity/api#VerifyIdentity
+   */
   public function VerifyIdentity(){
 
     // 이용기관코드, 파트너 사이트에서 확인
@@ -147,7 +143,7 @@ class PasscertController extends Controller
     // 본인인증 검증 요청정보 객체
     $PassIdentityVerify = new PassIdentityVerify();
 
-    $PassIdentityVerify->receiverHP = $this->PasscertService->encrypt('010012341234');
+    $PassIdentityVerify->receiverHP = $this->PasscertService->encrypt('01012341234');
     $PassIdentityVerify->receiverName = $this->PasscertService->encrypt('홍길동');
 
     try {
@@ -162,10 +158,10 @@ class PasscertController extends Controller
     return view('PassCert/VerifyIdentity', ['result' => $result]);
   }
 
- /* 
-  * 패스 이용자에게 문서의 전자서명을 요청합니다.
-  * https://developers.barocert.com/reference/pass/java/sign/api#RequestSign
-  */
+  /* 
+   * 패스 이용자에게 문서의 전자서명을 요청합니다.
+   * https://developers.barocert.com/reference/pass/php/sign/api#RequestSign
+   */
   public function RequestSign(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
@@ -175,7 +171,7 @@ class PasscertController extends Controller
     $PassSign = new PassSign();
 
     // 수신자 휴대폰번호 - 11자 (하이픈 제외)
-    $PassSign->receiverHP = $this->PasscertService->encrypt('010012341234');
+    $PassSign->receiverHP = $this->PasscertService->encrypt('01012341234');
     // 수신자 성명 - 80자
     $PassSign->receiverName = $this->PasscertService->encrypt('홍길동');
     // 수신자 생년월일 - 8자 (yyyyMMdd)
@@ -232,12 +228,12 @@ class PasscertController extends Controller
     return view('PassCert/RequestSign', ['result' => $result]);
   }
 
- /*
-  * 전자서명 요청 후 반환받은 접수아이디로 인증 진행 상태를 확인합니다.
-  * 상태확인 함수는 전자서명 요청 함수를 호출한 당일 23시 59분 59초까지만 호출 가능합니다.
-  * 전자서명 요청 함수를 호출한 당일 23시 59분 59초 이후 상태확인 함수를 호출할 경우 오류가 반환됩니다.
-  * https://developers.barocert.com/reference/pass/java/sign/api#GetSignStatus
-  */
+  /*
+   * 전자서명 요청 후 반환받은 접수아이디로 인증 진행 상태를 확인합니다.
+   * 상태확인 함수는 전자서명 요청 함수를 호출한 당일 23시 59분 59초까지만 호출 가능합니다.
+   * 전자서명 요청 함수를 호출한 당일 23시 59분 59초 이후 상태확인 함수를 호출할 경우 오류가 반환됩니다.
+   * https://developers.barocert.com/reference/pass/php/sign/api#GetSignStatus
+   */
   public function GetSignStatus(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
@@ -258,12 +254,12 @@ class PasscertController extends Controller
     return view('PassCert/GetSignStatus', ['result' => $result]);
   }
 
- /*
-  * 완료된 전자서명을 검증하고 전자서명값(signedData)을 반환 받습니다.
-  * 검증 함수는 전자서명 요청 함수를 호출한 당일 23시 59분 59초까지만 호출 가능합니다.
-  * 전자서명 요청 함수를 호출한 당일 23시 59분 59초 이후 검증 함수를 호출할 경우 오류가 반환됩니다.
-  * https://developers.barocert.com/reference/pass/java/sign/api#VerifySign
-  */
+  /*
+   * 완료된 전자서명을 검증하고 전자서명값(signedData)을 반환 받습니다.
+   * 검증 함수는 전자서명 요청 함수를 호출한 당일 23시 59분 59초까지만 호출 가능합니다.
+   * 전자서명 요청 함수를 호출한 당일 23시 59분 59초 이후 검증 함수를 호출할 경우 오류가 반환됩니다.
+   * https://developers.barocert.com/reference/pass/php/sign/api#VerifySign
+   */
   public function VerifySign(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
@@ -275,7 +271,7 @@ class PasscertController extends Controller
     // 전자서명 검증 요청정보 객체
     $PassSignVerify = new PassSignVerify();
 
-    $PassSignVerify->receiverHP = $this->PasscertService->encrypt('010012341234');
+    $PassSignVerify->receiverHP = $this->PasscertService->encrypt('01012341234');
     $PassSignVerify->receiverName = $this->PasscertService->encrypt('홍길동');
 
     try {
@@ -290,59 +286,59 @@ class PasscertController extends Controller
     return view('PassCert/VerifySign', ['result' => $result]);
   }
   
- /*
-  * 패스 이용자에게 자동이체 출금동의를 요청합니다.
-  * https://developers.barocert.com/reference/pass/java/cms/api#RequestCMS
-  */
+  /*
+   * 패스 이용자에게 자동이체 출금동의를 요청합니다.
+   * https://developers.barocert.com/reference/pass/php/cms/api#RequestCMS
+   */
   public function RequestCMS(){
 
-      // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-      $clientCode = '023070000014';
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023070000014';
 
-      // 출금동의 요청 정보 객체
-      $PassCMS = new PassCMS();
+    // 출금동의 요청 정보 객체
+    $PassCMS = new PassCMS();
 
-      // 수신자 휴대폰번호 - 11자 (하이픈 제외)
-      $PassCMS->receiverHP = $this->PasscertService->encrypt('010012341234');
-      // 수신자 성명 - 80자
-      $PassCMS->receiverName = $this->PasscertService->encrypt('홍길동');
-      // 수신자 생년월일 - 8자 (yyyyMMdd)
-      $PassCMS->receiverBirthday = $this->PasscertService->encrypt('19700101');
+    // 수신자 휴대폰번호 - 11자 (하이픈 제외)
+    $PassCMS->receiverHP = $this->PasscertService->encrypt('01012341234');
+    // 수신자 성명 - 80자
+    $PassCMS->receiverName = $this->PasscertService->encrypt('홍길동');
+    // 수신자 생년월일 - 8자 (yyyyMMdd)
+    $PassCMS->receiverBirthday = $this->PasscertService->encrypt('19700101');
 
-      // 요청 메시지 제목 - 최대 40자
-      $PassCMS->reqTitle = '출금동의 요청 메시지 제목';
-      // 요청 메시지 - 최대 500자
-      $PassCMS->reqMessage = $this->PasscertService->encrypt('출금동의 요청 메시지 내용');
-      // 고객센터 연락처 - 최대 12자
-      $PassCMS->callCenterNum = '1600-9854';
-      // 요청 만료시간 - 최대 1,000(초)까지 입력 가능
-      $PassCMS->expireIn = 1000;
-      // 사용자 동의 필요 여부
-      $PassCMS->userAgreementYN = true;
-      // 사용자 정보 포함 여부
-      $PassCMS->receiverInfoYN = true;
+    // 요청 메시지 제목 - 최대 40자
+    $PassCMS->reqTitle = '출금동의 요청 메시지 제목';
+    // 요청 메시지 - 최대 500자
+    $PassCMS->reqMessage = $this->PasscertService->encrypt('출금동의 요청 메시지 내용');
+    // 고객센터 연락처 - 최대 12자
+    $PassCMS->callCenterNum = '1600-9854';
+    // 요청 만료시간 - 최대 1,000(초)까지 입력 가능
+    $PassCMS->expireIn = 1000;
+    // 사용자 동의 필요 여부
+    $PassCMS->userAgreementYN = true;
+    // 사용자 정보 포함 여부
+    $PassCMS->receiverInfoYN = true;
 
-      // 출금은행명 - 최대 100자
-      $PassCMS->bankName = $this->PasscertService->encrypt('국민은행');
-      // 출금계좌번호 - 최대 31자
-      $PassCMS->bankAccountNum = $this->PasscertService->encrypt('9-****-5117-58');
-      // 출금계좌 예금주명 - 최대 100자
-      $PassCMS->bankAccountName = $this->PasscertService->encrypt('홍길동');
-      // 출금유형
-      // CMS - 출금동의, OPEN_BANK - 오픈뱅킹
-      $PassCMS->bankServiceType = $this->PasscertService->encrypt('CMS'); 
-      // 출금액
-      $PassCMS->bankWithdraw = $this->PasscertService->encrypt('1,000,000원'); 
+    // 출금은행명 - 최대 100자
+    $PassCMS->bankName = $this->PasscertService->encrypt('국민은행');
+    // 출금계좌번호 - 최대 31자
+    $PassCMS->bankAccountNum = $this->PasscertService->encrypt('9-****-5117-58');
+    // 출금계좌 예금주명 - 최대 100자
+    $PassCMS->bankAccountName = $this->PasscertService->encrypt('홍길동');
+    // 출금유형
+    // CMS - 출금동의, OPEN_BANK - 오픈뱅킹
+    $PassCMS->bankServiceType = $this->PasscertService->encrypt('CMS'); 
+    // 출금액
+    $PassCMS->bankWithdraw = $this->PasscertService->encrypt('1,000,000원'); 
 
-      // AppToApp 요청 여부
-      // true - AppToApp 인증방식, false - Push 인증방식
-      $PassCMS->appUseYN = false; 
-      // ApptoApp 인증방식에서 사용
-      // 통신사 유형('SKT', 'KT', 'LGU'), 대문자 입력(대소문자 구분)
-      // $PassCMS->telcoType = 'SKT';
-      // ApptoApp 인증방식에서 사용
-      // 모바일장비 유형('ANDROID', 'IOS'), 대문자 입력(대소문자 구분)
-      // $PassCMS->deviceOSType = 'IOS';
+    // AppToApp 요청 여부
+    // true - AppToApp 인증방식, false - Push 인증방식
+    $PassCMS->appUseYN = false; 
+    // ApptoApp 인증방식에서 사용
+    // 통신사 유형('SKT', 'KT', 'LGU'), 대문자 입력(대소문자 구분)
+    // $PassCMS->telcoType = 'SKT';
+    // ApptoApp 인증방식에서 사용
+    // 모바일장비 유형('ANDROID', 'IOS'), 대문자 입력(대소문자 구분)
+    // $PassCMS->deviceOSType = 'IOS';
 
     try {
         $result = $this->PasscertService->requestCMS($clientCode, $PassCMS);
@@ -357,11 +353,11 @@ class PasscertController extends Controller
   }
 
   /*
-  * 자동이체 출금동의 요청 후 반환받은 접수아이디로 인증 진행 상태를 확인합니다.
-  * 상태확인 함수는 자동이체 출금동의 요청 함수를 호출한 당일 23시 59분 59초까지만 호출 가능합니다.
-  * 자동이체 출금동의 요청 함수를 호출한 당일 23시 59분 59초 이후 상태확인 함수를 호출할 경우 오류가 반환됩니다.
-  * https://developers.barocert.com/reference/pass/java/cms/api#GetCMSStatus
-  */
+   * 자동이체 출금동의 요청 후 반환받은 접수아이디로 인증 진행 상태를 확인합니다.
+   * 상태확인 함수는 자동이체 출금동의 요청 함수를 호출한 당일 23시 59분 59초까지만 호출 가능합니다.
+   * 자동이체 출금동의 요청 함수를 호출한 당일 23시 59분 59초 이후 상태확인 함수를 호출할 경우 오류가 반환됩니다.
+   * https://developers.barocert.com/reference/pass/php/cms/api#GetCMSStatus
+   */
   public function GetCMSStatus(){
 
     // 이용기관코드, 파트너 사이트에서 확인
@@ -383,11 +379,11 @@ class PasscertController extends Controller
   }
 
   /*
-  * 완료된 전자서명을 검증하고 전자서명값(signedData)을 반환 받습니다.
-  * 검증 함수는 자동이체 출금동의 요청 함수를 호출한 당일 23시 59분 59초까지만 호출 가능합니다.
-  * 자동이체 출금동의 요청 함수를 호출한 당일 23시 59분 59초 이후 검증 함수를 호출할 경우 오류가 반환됩니다.
-  * https://developers.barocert.com/reference/pass/java/cms/api#VerifyCMS
-  */
+   * 완료된 전자서명을 검증하고 전자서명값(signedData)을 반환 받습니다.
+   * 검증 함수는 자동이체 출금동의 요청 함수를 호출한 당일 23시 59분 59초까지만 호출 가능합니다.
+   * 자동이체 출금동의 요청 함수를 호출한 당일 23시 59분 59초 이후 검증 함수를 호출할 경우 오류가 반환됩니다.
+   * https://developers.barocert.com/reference/pass/php/cms/api#VerifyCMS
+   */
   public function VerifyCMS(){
 
     // 이용기관코드, 파트너 사이트에서 확인
@@ -396,10 +392,10 @@ class PasscertController extends Controller
     // 출금동의 요청시 반환된 접수아이디
     $receiptID = '02308010230700000140000000000008';
 
-    // 전자서명 검증 요청정보 객체
+    // 출금동의 검증 요청정보 객체
     $PassCMSVerify = new PassCMSVerify();
 
-    $PassCMSVerify->receiverHP = $this->PasscertService->encrypt('010012341234');
+    $PassCMSVerify->receiverHP = $this->PasscertService->encrypt('01012341234');
     $PassCMSVerify->receiverName = $this->PasscertService->encrypt('홍길동');
 
     try {
@@ -414,50 +410,50 @@ class PasscertController extends Controller
     return view('PassCert/VerifyCMS', ['result' => $result]);
   }
 
- /*
-  * 패스 이용자에게 간편로그인을 요청합니다.
-  * https://developers.barocert.com/reference/pass/java/login/api#RequestLogin
-  */
+  /*
+   * 패스 이용자에게 간편로그인을 요청합니다.
+   * https://developers.barocert.com/reference/pass/php/login/api#RequestLogin
+   */
   public function RequestLogin(){
 
-  // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-  $clientCode = '023070000014';
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023070000014';
 
-  // 간편로그인 요청정보 객체
-  $PassLogin = new PassLogin();
+    // 간편로그인 요청정보 객체
+    $PassLogin = new PassLogin();
 
-  // 수신자 휴대폰번호 - 11자 (하이픈 제외)
-  $PassLogin->receiverHP = $this->PasscertService->encrypt('010012341234');
-  // 수신자 성명 - 80자
-  $PassLogin->receiverName = $this->PasscertService->encrypt('홍길동');
-  // 수신자 생년월일 - 8자 (yyyyMMdd)
-  $PassLogin->receiverBirthday = $this->PasscertService->encrypt('19700101');
-  
-  // 요청 메시지 제목 - 최대 40자
-  $PassLogin->reqTitle = '간편로그인 요청 메시지 제목';
-  // 요청 메시지 - 최대 500자
-  $PassLogin->reqMessage = $this->PasscertService->encrypt('간편로그인 요청 메시지 내용');
-  // 고객센터 연락처 - 최대 12자
-  $PassLogin->callCenterNum = '1600-9854';
-  // 요청 만료시간 - 최대 1,000(초)까지 입력 가능
-  $PassLogin->expireIn = 1000;
-  // 서명 원문 - 최대 2,800자 까지 입력가능
-  $PassLogin->token = $this->PasscertService->encrypt('간편로그인 요청 토큰');
+    // 수신자 휴대폰번호 - 11자 (하이픈 제외)
+    $PassLogin->receiverHP = $this->PasscertService->encrypt('01012341234');
+    // 수신자 성명 - 80자
+    $PassLogin->receiverName = $this->PasscertService->encrypt('홍길동');
+    // 수신자 생년월일 - 8자 (yyyyMMdd)
+    $PassLogin->receiverBirthday = $this->PasscertService->encrypt('19700101');
+    
+    // 요청 메시지 제목 - 최대 40자
+    $PassLogin->reqTitle = '간편로그인 요청 메시지 제목';
+    // 요청 메시지 - 최대 500자
+    $PassLogin->reqMessage = $this->PasscertService->encrypt('간편로그인 요청 메시지 내용');
+    // 고객센터 연락처 - 최대 12자
+    $PassLogin->callCenterNum = '1600-9854';
+    // 요청 만료시간 - 최대 1,000(초)까지 입력 가능
+    $PassLogin->expireIn = 1000;
+    // 서명 원문 - 최대 2,800자 까지 입력가능
+    $PassLogin->token = $this->PasscertService->encrypt('간편로그인 요청 토큰');
 
-  // 사용자 동의 필요 여부
-  $PassLogin->userAgreementYN = true;
-  // 사용자 정보 포함 여부
-  $PassLogin->receiverInfoYN = true;
+    // 사용자 동의 필요 여부
+    $PassLogin->userAgreementYN = true;
+    // 사용자 정보 포함 여부
+    $PassLogin->receiverInfoYN = true;
 
-  // AppToApp 요청 여부
-  // true - AppToApp 인증방식, false - Push 인증방식
-  $PassLogin->appUseYN = false;
-  // ApptoApp 인증방식에서 사용
-  // 통신사 유형('SKT', 'KT', 'LGU'), 대문자 입력(대소문자 구분)
-  // $PassLogin->telcoType = 'SKT';
-  // ApptoApp 인증방식에서 사용
-  // 모바일장비 유형('ANDROID', 'IOS'), 대문자 입력(대소문자 구분)
-  // $PassLogin->deviceOSType = 'IOS';
+    // AppToApp 요청 여부
+    // true - AppToApp 인증방식, false - Push 인증방식
+    $PassLogin->appUseYN = false;
+    // ApptoApp 인증방식에서 사용
+    // 통신사 유형('SKT', 'KT', 'LGU'), 대문자 입력(대소문자 구분)
+    // $PassLogin->telcoType = 'SKT';
+    // ApptoApp 인증방식에서 사용
+    // 모바일장비 유형('ANDROID', 'IOS'), 대문자 입력(대소문자 구분)
+    // $PassLogin->deviceOSType = 'IOS';
 
     try {
       $result = $this->PasscertService->requestLogin($clientCode, $PassLogin);
@@ -470,20 +466,19 @@ class PasscertController extends Controller
 
     return view('PassCert/RequestLogin', ['result' => $result]);
   }
-
   
- /*
-  * 간편로그인 요청 후 반환받은 접수아이디로 진행 상태를 확인합니다.
-  * 상태확인 함수는 간편로그인 요청 함수를 호출한 당일 23시 59분 59초까지만 호출 가능합니다.
-  * 간편로그인 요청 함수를 호출한 당일 23시 59분 59초 이후 상태확인 함수를 호출할 경우 오류가 반환됩니다.
-  * https://developers.barocert.com/reference/pass/java/login/api#GetLoginStatus
-  */
+  /*
+   * 간편로그인 요청 후 반환받은 접수아이디로 진행 상태를 확인합니다.
+   * 상태확인 함수는 간편로그인 요청 함수를 호출한 당일 23시 59분 59초까지만 호출 가능합니다.
+   * 간편로그인 요청 함수를 호출한 당일 23시 59분 59초 이후 상태확인 함수를 호출할 경우 오류가 반환됩니다.
+   * https://developers.barocert.com/reference/pass/php/login/api#GetLoginStatus
+   */
   public function GetLoginStatus(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
     $clientCode = '023070000014';
 
-    // 본인인증 요청시 반환된 접수아이디
+    // 간편로그인 요청시 반환된 접수아이디
     $receiptID = '02308010230700000140000000000009';
 
     try {
@@ -498,24 +493,24 @@ class PasscertController extends Controller
     return view('PassCert/GetLoginStatus', ['result' => $result]);
   }
 
- /*
-  * 완료된 전자서명을 검증하고 전자서명값(signedData)을 반환 받습니다.
-  * 검증 함수는 간편로그인 요청 함수를 호출한 당일 23시 59분 59초까지만 호출 가능합니다.
-  * 간편로그인 요청 함수를 호출한 당일 23시 59분 59초 이후 검증 함수를 호출할 경우 오류가 반환됩니다.
-  * https://developers.barocert.com/reference/pass/java/login/api#VerifyLogin
-  */
+  /*
+   * 완료된 전자서명을 검증하고 전자서명값(signedData)을 반환 받습니다.
+   * 검증 함수는 간편로그인 요청 함수를 호출한 당일 23시 59분 59초까지만 호출 가능합니다.
+   * 간편로그인 요청 함수를 호출한 당일 23시 59분 59초 이후 검증 함수를 호출할 경우 오류가 반환됩니다.
+   * https://developers.barocert.com/reference/pass/php/login/api#VerifyLogin
+   */
   public function VerifyLogin(){
 
     // 이용기관코드, 파트너 사이트에서 확인
     $clientCode = '023070000014';
 
-    // 본인인증 요청시 반환된 접수아이디
+    // 간편로그인 요청시 반환된 접수아이디
     $receiptID = '02308010230700000140000000000009';
 
     // 간편로그인 검증 요청정보 객체
     $PassLoginVerify = new PassLoginVerify();
 
-    $PassLoginVerify->receiverHP = $this->PasscertService->encrypt('010012341234');
+    $PassLoginVerify->receiverHP = $this->PasscertService->encrypt('01012341234');
     $PassLoginVerify->receiverName = $this->PasscertService->encrypt('홍길동');
 
     try {

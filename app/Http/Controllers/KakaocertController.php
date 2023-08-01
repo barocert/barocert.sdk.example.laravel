@@ -7,35 +7,30 @@ use Illuminate\Http\Request;
 use Linkhub\LinkhubException;
 use Linkhub\Barocert\KakaocertService;
 use Linkhub\Barocert\BaseService;
-use Linkhub\Barocert\KakaoSign;
-use Linkhub\Barocert\KakaoGetSignStatus;
 use Linkhub\Barocert\KakaoIdentity;
-use Linkhub\Barocert\KakaoGetIdentityStatus;
+use Linkhub\Barocert\KakaoSign;
 use Linkhub\Barocert\KakaoMultiSign;
-use Linkhub\Barocert\KakaoGetMultiSignStatus;
 use Linkhub\Barocert\KakaoMultiSignTokens;
 use Linkhub\Barocert\KakaoCMS;
-use Linkhub\Barocert\KakaoGetCMSState;
-use Linkhub\Barocert\KakaoLogin;
 
 class KakaocertController extends Controller
 {
   public function __construct() {
 
     // 통신방식 설정
-    define('LINKHUB_COMM_MODE', config('kakaocert.LINKHUB_COMM_MODE'));
+    define('LINKHUB_COMM_MODE', config('barocert.LINKHUB_COMM_MODE'));
 
     // 카카오써트 서비스 클래스 초기화
-    $this->KakaocertService = new KakaocertService(config('kakaocert.LinkID'), config('kakaocert.SecretKey'));
+    $this->KakaocertService = new KakaocertService(config('barocert.LinkID'), config('barocert.SecretKey'));
 
     // 인증토큰의 IP제한기능 사용여부, true-사용, false-미사용, 기본값(true)
-    $this->KakaocertService->IPRestrictOnOff(config('kakaocert.IPRestrictOnOff'));
+    $this->KakaocertService->IPRestrictOnOff(config('barocert.IPRestrictOnOff'));
 
     // 카카오써트 API 서비스 고정 IP 사용여부, true-사용, false-미사용, 기본값(false)
-    $this->KakaocertService->UseStaticIP(config('kakaocert.UseStaticIP'));
+    $this->KakaocertService->UseStaticIP(config('barocert.UseStaticIP'));
 
     // 로컬시스템 시간 사용여부, true-사용, false-미사용, 기본값(true)
-    $this->KakaocertService->UseLocalTimeYN(config('kakaocert.UseLocalTimeYN'));
+    $this->KakaocertService->UseLocalTimeYN(config('barocert.UseLocalTimeYN'));
   }
 
   // HTTP Get Request URI -> 함수 라우팅 처리 함수
@@ -45,8 +40,8 @@ class KakaocertController extends Controller
   }
 
   /*
-   * 카카오톡 사용자에게 본인인증 전자서명을 요청합니다.
-   * https://developers.barocert.com/reference/kakao/java/identity/api#RequestIdentity
+   * 카카오톡 이용자에게 본인인증을 요청합니다.
+   * https://developers.barocert.com/reference/kakao/php/identity/api#RequestIdentity
    */
   public function RequestIdentity(){
 
@@ -73,7 +68,7 @@ class KakaocertController extends Controller
     // true - AppToApp 인증방식, false - Talk Message 인증방식
     $KakaoIdentity->appUseYN = false;
 
-    // App to App 방식 이용시, 에러시 호출할 URL
+    // App to App 방식 이용시, 호출할 URL
     // $KakaoIdentity->returnURL = 'https://kakao.barocert.com';
 
     try {
@@ -89,8 +84,8 @@ class KakaocertController extends Controller
   }
 
   /*
-   * 본인인증 요청시 반환된 접수아이디를 통해 서명 상태를 확인합니다.
-   * https://developers.barocert.com/reference/kakao/java/identity/api#GetIdentityStatus
+   * 본인인증 요청 후 반환받은 접수아이디로 본인인증 진행 상태를 확인합니다.
+   * https://developers.barocert.com/reference/kakao/php/identity/api#GetIdentityStatus
    */
   public function GetIdentityStatus(){
 
@@ -113,9 +108,11 @@ class KakaocertController extends Controller
   }
 
   /*
-   * 본인인증 요청시 반환된 접수아이디를 통해 본인인증 서명을 검증합니다.
-   * 검증하기 API는 완료된 전자서명 요청당 1회만 요청 가능하며, 사용자가 서명을 완료후 유효시간(10분)이내에만 요청가능 합니다.
-   * https://developers.barocert.com/reference/kakao/java/identity/api#VerifyIdentity
+   * 완료된 전자서명을 검증하고 전자서명값(signedData)을 반환 받습니다.
+   * 반환받은 전자서명값(signedData)과 [1. RequestIdentity] 함수 호출에 입력한 Token의 동일 여부를 확인하여 이용자의 본인인증 검증을 완료합니다.
+   * 카카오 보안정책에 따라 검증 API는 1회만 호출할 수 있습니다. 재시도시 오류가 반환됩니다.
+   * 전자서명 완료일시로부터 10분 이내에 검증 API를 호출하지 않으면 오류가 반환됩니다.
+   * https://developers.barocert.com/reference/kakao/php/identity/api#VerifyIdentity
    */
   public function VerifyIdentity(){
 
@@ -138,8 +135,8 @@ class KakaocertController extends Controller
   }
 
   /* 
-   * 카카오톡 사용자에게 전자서명을 요청합니다.(단건)
-   * https://developers.barocert.com/reference/kakao/java/sign/api-single#RequestSign
+   * 카카오톡 이용자에게 단건(1건) 문서의 전자서명을 요청합니다.
+   * https://developers.barocert.com/reference/kakao/php/sign/api-single#RequestSign
    */
   public function RequestSign(){
 
@@ -169,7 +166,7 @@ class KakaocertController extends Controller
     // true - AppToApp 인증방식, false - Talk Message 인증방식
     $KakaoSign->appUseYN = false;
 
-    // App to App 방식 이용시, 에러시 호출할 URL
+    // App to App 방식 이용시, 호출할 URL
     // $KakaoSign->returnURL = 'https://kakao.barocert.com';
 
     try {
@@ -185,8 +182,8 @@ class KakaocertController extends Controller
   }
 
   /*
-   * 전자서명 요청에 대한 서명 상태를 확인합니다.
-   * https://developers.barocert.com/reference/kakao/java/sign/api-single#GetSignStatus
+   * 전자서명(단건) 요청 후 반환받은 접수아이디로 인증 진행 상태를 확인합니다.
+   * https://developers.barocert.com/reference/kakao/php/sign/api-single#GetSignStatus
    */
   public function GetSignStatus(){
 
@@ -209,9 +206,10 @@ class KakaocertController extends Controller
   }
 
   /*
-   * 전자서명 요청시 반환된 접수아이디를 통해 서명을 검증합니다. (단건)
-   * 검증하기 API는 완료된 전자서명 요청당 1회만 요청 가능하며, 사용자가 서명을 완료후 유효시간(10분)이내에만 요청가능 합니다.
-   * https://developers.barocert.com/reference/kakao/java/sign/api-single#VerifySign
+   * 완료된 전자서명을 검증하고 전자서명값(signedData)을 반환 받습니다.
+   * 카카오 보안정책에 따라 검증 API는 1회만 호출할 수 있습니다. 재시도시 오류가 반환됩니다.
+   * 전자서명 완료일시로부터 10분 이내에 검증 API를 호출하지 않으면 오류가 반환됩니다.
+   * https://developers.barocert.com/reference/kakao/php/sign/api-single#VerifySign
    */
   public function VerifySign(){
 
@@ -234,8 +232,8 @@ class KakaocertController extends Controller
   }
 
   /*
-   * 카카오톡 사용자에게 전자서명을 요청합니다.(복수)
-   * https://developers.barocert.com/reference/kakao/java/sign/api-multi#RequestMultiSign
+   * 카카오톡 이용자에게 복수(최대 20건) 문서의 전자서명을 요청합니다.
+   * https://developers.barocert.com/reference/kakao/php/sign/api-multi#RequestMultiSign
    */
   public function RequestMultiSign(){
 
@@ -251,7 +249,7 @@ class KakaocertController extends Controller
     $KakaoMultiSign->receiverName = $this->KakaocertService->encrypt('홍길동');
     $KakaoMultiSign->receiverBirthday = $this->KakaocertService->encrypt('19700101');
 
-      // 인증요청 메시지 제목 - 최대 40자
+    // 인증요청 메시지 제목 - 최대 40자
     $KakaoMultiSign->reqTitle = '전자서명복수테스트';
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
     $KakaoMultiSign->expireIn = 1000;
@@ -280,7 +278,7 @@ class KakaocertController extends Controller
     // true - AppToApp 인증방식, false - Talk Message 인증방식
     $KakaoMultiSign->appUseYN = false;
 
-    // App to App 방식 이용시, 에러시 호출할 URL
+    // App to App 방식 이용시, 호출할 URL
     // $KakaoMultiSign->returnURL = 'https://kakao.barocert.com';
 
     try {
@@ -296,8 +294,8 @@ class KakaocertController extends Controller
   }
 
   /*
-   * 전자서명 요청시 반환된 접수아이디를 통해 서명 상태를 확인합니다. (복수)
-   * https://developers.barocert.com/reference/kakao/java/sign/api-multi#GetMultiSignStatus
+   * 전자서명(복수) 요청 후 반환받은 접수아이디로 인증 진행 상태를 확인합니다.
+   * https://developers.barocert.com/reference/kakao/php/sign/api-multi#GetMultiSignStatus
    */
   public function GetMultiSignStatus(){
 
@@ -320,9 +318,10 @@ class KakaocertController extends Controller
   }
 
   /*
-   * 전자서명 요청시 반환된 접수아이디를 통해 서명을 검증합니다. (복수)
-   * 검증하기 API는 완료된 전자서명 요청당 1회만 요청 가능하며, 사용자가 서명을 완료후 유효시간(10분)이내에만 요청가능 합니다.
-   * https://developers.barocert.com/reference/kakao/java/sign/api-multi#VerifyMultiSign
+   * 완료된 전자서명을 검증하고 전자서명값(signedData)을 반환 받습니다.
+   * 카카오 보안정책에 따라 검증 API는 1회만 호출할 수 있습니다. 재시도시 오류가 반환됩니다.
+   * 전자서명 완료일시로부터 10분 이내에 검증 API를 호출하지 않으면 오류가 반환됩니다.
+   * https://developers.barocert.com/reference/kakao/php/sign/api-multi#VerifyMultiSign
    */
   public function VerifyMultiSign(){
 
@@ -345,8 +344,8 @@ class KakaocertController extends Controller
   }
   
   /*
-   * 카카오톡 사용자에게 출금동의 전자서명을 요청합니다.
-   * https://developers.barocert.com/reference/kakao/java/cms/api#RequestCMS
+   * 카카오톡 이용자에게 자동이체 출금동의를 요청합니다.
+   * https://developers.barocert.com/reference/kakao/php/cms/api#RequestCMS
    */
   public function RequestCMS(){
 
@@ -384,7 +383,7 @@ class KakaocertController extends Controller
       // true - AppToApp 인증방식, false - Talk Message 인증방식
       $KakaoCMS->appUseYN = false; 
 
-      // App to App 방식 이용시, 에러시 호출할 URL
+      // App to App 방식 이용시, 호출할 URL
       // $KakaoCMS->returnURL = 'https://kakao.barocert.com';
 
     try {
@@ -400,8 +399,8 @@ class KakaocertController extends Controller
   }
 
   /*
-   * 카카오 출금동의 요청시 반환된 접수아이디를 통해 서명 상태를 확인합니다.
-   * https://developers.barocert.com/reference/kakao/java/cms/api#GetCMSStatus
+   * 자동이체 출금동의 요청 후 반환받은 접수아이디로 인증 진행 상태를 확인합니다.
+   * https://developers.barocert.com/reference/kakao/php/cms/api#GetCMSStatus
    */
   public function GetCMSStatus(){
 
@@ -423,11 +422,12 @@ class KakaocertController extends Controller
     return view('KakaoCert/GetCMSStatus', ['result' => $result]);
   }
 
- /*
-  * 자동이체 출금동의 요청시 반환된 접수아이디를 통해 서명을 검증합니다.
-  * 검증하기 API는 완료된 전자서명 요청당 1회만 요청 가능하며, 사용자가 서명을 완료후 유효시간(10분)이내에만 요청가능 합니다.
-  * https://developers.barocert.com/reference/kakao/java/cms/api#VerifyCMS
-  */
+  /*
+   * 완료된 전자서명을 검증하고 전자서명값(signedData)을 반환 받습니다.
+   * 카카오 보안정책에 따라 검증 API는 1회만 호출할 수 있습니다. 재시도시 오류가 반환됩니다.
+   * 전자서명 완료일시로부터 10분 이내에 검증 API를 호출하지 않으면 오류가 반환됩니다.
+   * https://developers.barocert.com/reference/kakao/php/cms/api#VerifyCMS
+   */
   public function VerifyCMS(){
 
     // 이용기관코드, 파트너 사이트에서 확인
