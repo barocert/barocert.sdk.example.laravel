@@ -2,7 +2,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" type="text/css" href="/css/example.css" media="screen"/>
-    <title>Barocert SDK PHP Laravel Example.</title>
+    <title>Passcert SDK PHP Laravel Example.</title>
 </head>
 <body>
 <div id="content">
@@ -11,7 +11,9 @@
     <fieldset class="fieldset1">
         <legend>{{\Request::fullUrl()}}</legend>
         <ul>
-            <li>{{ $filedName }} :  {{ $value }}</li>
+            <li>접수아이디 (receiptID) : {{ $result->receiptId }}</li>
+            <li>앱스킴 (scheme): {{ $result->scheme }}</li>
+            <li>앱다운로드URL (marketUrl): {{ $result->marketUrl }}</li>
         </ul>
     </fieldset>
 </div>

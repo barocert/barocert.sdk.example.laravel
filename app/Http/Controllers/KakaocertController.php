@@ -5,15 +5,18 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use Linkhub\LinkhubException;
-use Linkhub\Barocert\BarocertException;
 use Linkhub\Barocert\KakaocertService;
+use Linkhub\Barocert\BaseService;
 use Linkhub\Barocert\KakaoSign;
 use Linkhub\Barocert\KakaoGetSignStatus;
 use Linkhub\Barocert\KakaoIdentity;
+use Linkhub\Barocert\KakaoGetIdentityStatus;
 use Linkhub\Barocert\KakaoMultiSign;
-use Linkhub\Barocert\KakaoGetCMSState;
+use Linkhub\Barocert\KakaoGetMultiSignStatus;
 use Linkhub\Barocert\KakaoMultiSignTokens;
 use Linkhub\Barocert\KakaoCMS;
+use Linkhub\Barocert\KakaoGetCMSState;
+use Linkhub\Barocert\KakaoLogin;
 
 class KakaocertController extends Controller
 {
@@ -22,16 +25,16 @@ class KakaocertController extends Controller
     // 통신방식 설정
     define('LINKHUB_COMM_MODE', config('kakaocert.LINKHUB_COMM_MODE'));
 
-    // kakaocert 서비스 클래스 초기화
+    // 카카오써트 서비스 클래스 초기화
     $this->KakaocertService = new KakaocertService(config('kakaocert.LinkID'), config('kakaocert.SecretKey'));
 
-    // 인증토큰의 IP제한기능 사용여부, 권장(true)
+    // 인증토큰의 IP제한기능 사용여부, true-사용, false-미사용, 기본값(true)
     $this->KakaocertService->IPRestrictOnOff(config('kakaocert.IPRestrictOnOff'));
 
     // 카카오써트 API 서비스 고정 IP 사용여부, true-사용, false-미사용, 기본값(false)
     $this->KakaocertService->UseStaticIP(config('kakaocert.UseStaticIP'));
 
-    // 로컬시스템 시간 사용 여부 true(기본값) - 사용, false(미사용)
+    // 로컬시스템 시간 사용여부, true-사용, false-미사용, 기본값(true)
     $this->KakaocertService->UseLocalTimeYN(config('kakaocert.UseLocalTimeYN'));
   }
 
@@ -47,17 +50,16 @@ class KakaocertController extends Controller
    */
   public function RequestIdentity(){
 
-    // 이용기관코드, 파트너가 등록한 이용기관의 코드, (파트너 사이트에서 확인가능)
-    $clientCode = '023030000004';
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023040000001';
 
     // 본인인증 요청정보 객체
     $KakaoIdentity = new KakaoIdentity();
 
-    // 수신자 휴대폰번호 - 11자 (하이픈 제외)
+    // 수신자 정보
+    // 휴대폰번호, 성명, 생년월일 
     $KakaoIdentity->receiverHP = $this->KakaocertService->encrypt('01012341234');
-    // 수신자 성명 - 80자
     $KakaoIdentity->receiverName = $this->KakaocertService->encrypt('홍길동');
-    // 수신자 생년월일 - 8자 (yyyyMMdd)
     $KakaoIdentity->receiverBirthday = $this->KakaocertService->encrypt('19700101');
     
     // 인증요청 메시지 제목 - 최대 40자
@@ -66,7 +68,6 @@ class KakaocertController extends Controller
     $KakaoIdentity->expireIn = 1000;
     // 서명 원문 - 최대 2,800자 까지 입력가능
     $KakaoIdentity->token = $this->KakaocertService->encrypt('본인인증요청토큰');
-
 
     // AppToApp 인증요청 여부
     // true - AppToApp 인증방식, false - Talk Message 인증방식
@@ -84,21 +85,20 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('RequestIdentity', ['result' => $result]);
+    return view('KakaoCert/RequestIdentity', ['result' => $result]);
   }
 
-  
   /*
    * 본인인증 요청시 반환된 접수아이디를 통해 서명 상태를 확인합니다.
    * https://developers.barocert.com/reference/kakao/java/identity/api#GetIdentityStatus
    */
   public function GetIdentityStatus(){
 
-    // 이용기관코드, 파트너가 등록한 이용기관의 코드, (파트너 사이트에서 확인가능)
-    $clientCode = '023030000004';
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023040000001';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02305080230300000040000000000014';
+    $receiptID = '02308010230400000010000000000006';
 
     try {
       $result = $this->KakaocertService->getIdentityStatus($clientCode, $receiptID);
@@ -109,21 +109,21 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('GetIdentityStatus', ['result' => $result]);
+    return view('KakaoCert/GetIdentityStatus', ['result' => $result]);
   }
 
   /*
-  * 본인인증 서명을 검증합니다.
-  * 검증하기 API는 완료된 전자서명 요청당 1회만 요청 가능하며, 사용자가 서명을 완료후 유효시간(10분)이내에만 요청가능 합니다.
-  * https://developers.barocert.com/reference/kakao/java/identity/api#VerifyIdentity
-  */
+   * 본인인증 요청시 반환된 접수아이디를 통해 본인인증 서명을 검증합니다.
+   * 검증하기 API는 완료된 전자서명 요청당 1회만 요청 가능하며, 사용자가 서명을 완료후 유효시간(10분)이내에만 요청가능 합니다.
+   * https://developers.barocert.com/reference/kakao/java/identity/api#VerifyIdentity
+   */
   public function VerifyIdentity(){
 
     // 이용기관코드, 파트너 사이트에서 확인
-    $clientCode = '023030000004';
+    $clientCode = '023040000001';
 
     // 본인인증 요청시 반환된 접수아이디
-    $receiptID = '02305080230300000040000000000014';
+    $receiptID = '02308010230400000010000000000006';
 
     try {
       $result = $this->KakaocertService->verifyIdentity($clientCode, $receiptID);
@@ -134,9 +134,8 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('VerifyIdentity', ['result' => $result]);
+    return view('KakaoCert/VerifyIdentity', ['result' => $result]);
   }
-
 
   /* 
    * 카카오톡 사용자에게 전자서명을 요청합니다.(단건)
@@ -144,17 +143,16 @@ class KakaocertController extends Controller
    */
   public function RequestSign(){
 
-    // 이용기관코드, 파트너가 등록한 이용기관의 코드, (파트너 사이트에서 확인가능)
-    $clientCode = '023030000004';
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023040000001';
 
     // 전자서명 요청정보 객체
     $KakaoSign = new KakaoSign();
 
-    // 수신자 휴대폰번호 - 11자 (하이픈 제외)
+    // 수신자 정보
+    // 휴대폰번호, 성명, 생년월일
     $KakaoSign->receiverHP = $this->KakaocertService->encrypt('01012341234');
-    // 수신자 생년월일 - 8자 (yyyyMMdd)
     $KakaoSign->receiverName = $this->KakaocertService->encrypt('홍길동');
-    // 수신자 성명 - 80자
     $KakaoSign->receiverBirthday = $this->KakaocertService->encrypt('19700101');
 
     // 인증요청 메시지 제목 - 최대 40자
@@ -183,7 +181,7 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('RequestSign', ['result' => $result]);
+    return view('KakaoCert/RequestSign', ['result' => $result]);
   }
 
   /*
@@ -192,11 +190,11 @@ class KakaocertController extends Controller
    */
   public function GetSignStatus(){
 
-    // 이용기관코드, 파트너가 등록한 이용기관의 코드, (파트너 사이트에서 확인가능)
-    $clientCode = '023030000004';
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023040000001';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02305080230300000040000000000015';
+    $receiptID = '02308010230400000010000000000007';
 
     try {
       $result = $this->KakaocertService->getSignStatus($clientCode, $receiptID);
@@ -207,7 +205,7 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('GetSignStatus', ['result' => $result]);
+    return view('KakaoCert/GetSignStatus', ['result' => $result]);
   }
 
   /*
@@ -217,11 +215,11 @@ class KakaocertController extends Controller
    */
   public function VerifySign(){
 
-    // 이용기관코드, 파트너가 등록한 이용기관의 코드, (파트너 사이트에서 확인가능)
-    $clientCode = '023030000004';
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023040000001';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02305080230300000040000000000015';
+    $receiptID = '02308010230400000010000000000007';
 
     try {
       $result = $this->KakaocertService->VerifySign($clientCode, $receiptID);
@@ -232,7 +230,7 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('VerifySign', ['result' => $result]);
+    return view('KakaoCert/VerifySign', ['result' => $result]);
   }
 
   /*
@@ -241,21 +239,20 @@ class KakaocertController extends Controller
    */
   public function RequestMultiSign(){
 
-     // 이용기관코드, 파트너가 등록한 이용기관의 코드, (파트너 사이트에서 확인가능)
-    $clientCode = '023030000004';
+     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023040000001';
 
     // 전자서명 요청정보 객체
     $KakaoMultiSign = new KakaoMultiSign();
 
-    // 수신자 휴대폰번호 - 11자 (하이픈 제외)
+    // 수신자 정보
+    // 휴대폰번호, 성명, 생년월일
     $KakaoMultiSign->receiverHP = $this->KakaocertService->encrypt('01012341234');
-    // 수신자 성명 - 80자
     $KakaoMultiSign->receiverName = $this->KakaocertService->encrypt('홍길동');
-    // 수신자 생년월일 - 8자 (yyyyMMdd)
     $KakaoMultiSign->receiverBirthday = $this->KakaocertService->encrypt('19700101');
 
       // 인증요청 메시지 제목 - 최대 40자
-    $KakaoMultiSign->reqTitle = '전자서명단건테스트';
+    $KakaoMultiSign->reqTitle = '전자서명복수테스트';
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
     $KakaoMultiSign->expireIn = 1000;
 
@@ -295,7 +292,7 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('RequestMultiSign', ['result' => $result]);
+    return view('KakaoCert/RequestMultiSign', ['result' => $result]);
   }
 
   /*
@@ -304,11 +301,11 @@ class KakaocertController extends Controller
    */
   public function GetMultiSignStatus(){
 
-    // 이용기관코드, 파트너가 등록한 이용기관의 코드, (파트너 사이트에서 확인가능)
-    $clientCode = '023030000004';
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023040000001';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02305080230300000040000000000016';
+    $receiptID = '02308010230400000010000000000008';
 
     try {
       $result = $this->KakaocertService->getMultiSignStatus($clientCode, $receiptID);
@@ -319,7 +316,7 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('GetMultiSignStatus', ['result' => $result]);
+    return view('KakaoCert/GetMultiSignStatus', ['result' => $result]);
   }
 
   /*
@@ -329,11 +326,11 @@ class KakaocertController extends Controller
    */
   public function VerifyMultiSign(){
 
-    // 이용기관코드, 파트너가 등록한 이용기관의 코드, (파트너 사이트에서 확인가능)
-    $clientCode = '023030000004';
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023040000001';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02305080230300000040000000000016';
+    $receiptID = '02308010230400000010000000000008';
 
     try {
       $result = $this->KakaocertService->verifyMultiSign($clientCode, $receiptID);
@@ -344,27 +341,25 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('VerifyMultiSign', ['result' => $result]);
+    return view('KakaoCert/VerifyMultiSign', ['result' => $result]);
   }
   
   /*
    * 카카오톡 사용자에게 출금동의 전자서명을 요청합니다.
-   * https://developers.barocert.com/reference/kakao/java/cms/api#RequestCMS 
+   * https://developers.barocert.com/reference/kakao/java/cms/api#RequestCMS
    */
   public function RequestCMS(){
 
-      // 이용기관코드, 파트너가 등록한 이용기관의 코드, (파트너 사이트에서 확인가능)
-      $clientCode = '023030000004';
+      // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+      $clientCode = '023040000001';
 
       // 출금동의 요청 정보 객체
       $KakaoCMS = new KakaoCMS();
 
-
-      // 수신자 휴대폰번호 - 11자 (하이픈 제외)
+      // 수신자 정보
+      // 휴대폰번호, 성명, 생년월일
       $KakaoCMS->receiverHP = $this->KakaocertService->encrypt('01012341234');
-      // 수신자 성명 - 80자
       $KakaoCMS->receiverName = $this->KakaocertService->encrypt('홍길동');
-      // 수신자 생년월일 - 8자 (yyyyMMdd)
       $KakaoCMS->receiverBirthday = $this->KakaocertService->encrypt('19700101');
 
       // 인증요청 메시지 제목 - 최대 40자
@@ -401,20 +396,20 @@ class KakaocertController extends Controller
         return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('RequestCMS', ['result' => $result]);
+    return view('KakaoCert/RequestCMS', ['result' => $result]);
   }
 
   /*
-   * 자동이체 출금동의 요청에 대한 서명 상태를 확인합니다.
+   * 카카오 출금동의 요청시 반환된 접수아이디를 통해 서명 상태를 확인합니다.
    * https://developers.barocert.com/reference/kakao/java/cms/api#GetCMSStatus
    */
   public function GetCMSStatus(){
 
     // 이용기관코드, 파트너 사이트에서 확인
-    $clientCode = '023030000004';
+    $clientCode = '023040000001';
 
     // 출금동의 요청시 반환된 접수아이디
-    $receiptID = '02305080230300000040000000000017';
+    $receiptID = '02308010230400000010000000000009';
 
     try {
       $result = $this->KakaocertService->getCMSStatus($clientCode, $receiptID);
@@ -425,21 +420,21 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('GetCMSStatus', ['result' => $result]);
+    return view('KakaoCert/GetCMSStatus', ['result' => $result]);
   }
 
-  /*
-   * 자동이체 출금동의 요청시 반환된 접수아이디를 통해 서명을 검증합니다.
-   * 검증하기 API는 완료된 전자서명 요청당 1회만 요청 가능하며, 사용자가 서명을 완료후 유효시간(10분)이내에만 요청가능 합니다.
-   * https://developers.barocert.com/reference/kakao/java/cms/api#VerifyCMS
-   */
+ /*
+  * 자동이체 출금동의 요청시 반환된 접수아이디를 통해 서명을 검증합니다.
+  * 검증하기 API는 완료된 전자서명 요청당 1회만 요청 가능하며, 사용자가 서명을 완료후 유효시간(10분)이내에만 요청가능 합니다.
+  * https://developers.barocert.com/reference/kakao/java/cms/api#VerifyCMS
+  */
   public function VerifyCMS(){
 
     // 이용기관코드, 파트너 사이트에서 확인
-    $clientCode = '023030000004';
+    $clientCode = '023040000001';
 
     // 출금동의 요청시 반환된 접수아이디
-    $receiptID = '02305080230300000040000000000017';
+    $receiptID = '02308010230400000010000000000009';
 
     try {
       $result = $this->KakaocertService->verifyCMS($clientCode, $receiptID);
@@ -450,6 +445,32 @@ class KakaocertController extends Controller
       return view('Response', ['code' => $code, 'message' => $message]);
     }
 
-    return view('VerifyCMS', ['result' => $result]);
+    return view('KakaoCert/VerifyCMS', ['result' => $result]);
+  }
+
+  /*
+   * 완료된 전자서명을 검증하고 전자서명 데이터 전문(signedData)을 반환 받습니다.
+   * 카카오 보안정책에 따라 검증 API는 1회만 호출할 수 있습니다. 재시도시 오류가 반환됩니다.
+   * 전자서명 완료일시로부터 10분 이내에 검증 API를 호출하지 않으면 오류가 반환됩니다.
+   * https://developers.barocert.com/reference/kakao/java/login/api#VerifyLogin
+   */
+  public function VerifyLogin(){
+
+    // 이용기관코드, 파트너 사이트에서 확인
+    $clientCode = '023040000001';
+
+    // 출금동의 요청시 반환된 트랜잭션 아이디
+    $txID = '01a1ea2ab9-1b91-427d-9e48-43a0747ee54c';
+
+    try {
+      $result = $this->KakaocertService->verifyLogin($clientCode, $txID);
+    }
+    catch(BarocertException $re) {
+      $code = $re->getCode();
+      $message = $re->getMessage();
+      return view('Response', ['code' => $code, 'message' => $message]);
+    }
+
+    return view('KakaoCert/VerifyLogin', ['result' => $result]);
   }
 }
