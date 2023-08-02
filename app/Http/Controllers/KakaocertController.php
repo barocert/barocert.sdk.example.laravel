@@ -452,14 +452,14 @@ class KakaocertController extends Controller
    * 완료된 전자서명을 검증하고 전자서명 데이터 전문(signedData)을 반환 받습니다.
    * 카카오 보안정책에 따라 검증 API는 1회만 호출할 수 있습니다. 재시도시 오류가 반환됩니다.
    * 전자서명 완료일시로부터 10분 이내에 검증 API를 호출하지 않으면 오류가 반환됩니다.
-   * https://developers.barocert.com/reference/kakao/java/login/api#VerifyLogin
+   * https://developers.barocert.com/reference/kakao/php/login/api#VerifyLogin
    */
   public function VerifyLogin(){
 
     // 이용기관코드, 파트너 사이트에서 확인
     $clientCode = '023040000001';
 
-    // 출금동의 요청시 반환된 트랜잭션 아이디
+    // 간편로그인 요청시 반환된 트랜잭션 아이디
     $txID = '01a1ea2ab9-1b91-427d-9e48-43a0747ee54c';
 
     try {
