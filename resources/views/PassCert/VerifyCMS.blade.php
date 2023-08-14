@@ -14,7 +14,8 @@
             <li>접수 아이디 (ReceiptID) : {{ $result->receiptID }}</li>
             <li>상태 (State) : {{ $result->state }}</li>
             <li>수신자 성명 (ReceiverName) : {{ $result->receiverName }}</li>
-            <li>수신자 생년월일 (ReceiverBirthday) : {{ $result->receiverBirthday }}</li>
+            <li>수신자 출생년도 (ReceiverYear) : {{ $result->receiverYear }}</li>
+            <li>수신자 출생월일 (ReceiverDay) : {{ $result->receiverDay }}</li>
             <li>수신자 성별 (ReceiverGender) : {{ $result->receiverGender }}</li>
             <li>수신자 휴대폰번호 (ReceiverHP) : {{ $result->receiverHP }}</li>
             <li>수신자 통신사유형 (ReceiverTelcoType) : {{ $result->receiverTelcoType }}</li>
