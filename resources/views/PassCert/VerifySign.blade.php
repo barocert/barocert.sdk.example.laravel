@@ -18,6 +18,7 @@
             <li>수신자 출생월일 (ReceiverDay) : {{ $result->receiverDay }}</li>
             <li>수신자 성별 (ReceiverGender) : {{ $result->receiverGender }}</li>
             <li>수신자 휴대폰번호 (ReceiverHP) : {{ $result->receiverHP }}</li>
+            <li>외국인 여부 (ReceiverForeign) : {{ $result->receiverForeign }}</li>
             <li>수신자 통신사유형 (ReceiverTelcoType) : {{ $result->receiverTelcoType }}</li>
             <li>전자서명 데이터 (signedData) : {{ $result->signedData }}</li>
             <li>연계정보 (Ci) : {{ $result->ci }}</li>
