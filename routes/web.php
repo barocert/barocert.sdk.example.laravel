@@ -18,4 +18,5 @@ Route::get('/', function () {
 });
 
 Route::get('/KakaocertService/{APIName}','KakaocertController@RouteHandelerFunc');
+Route::get('/NavercertService/{APIName}','NavercertController@RouteHandelerFunc');
 Route::get('/PasscertService/{APIName}','PasscertController@RouteHandelerFunc');

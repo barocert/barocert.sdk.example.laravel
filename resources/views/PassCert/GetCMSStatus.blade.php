@@ -29,7 +29,7 @@
             <li>통신사 유형 (TelcoType) : {{ $result->telcoType }}</li>
             <li>모바일장비 유형 (DeviceOSType) : {{ $result->deviceOSType }}</li>
             <li>앱스킴 (Scheme): {{ $result->scheme }}</li>
-            <li>앱사용유무 (AppUseYN) : {{ $result->appUseYN }}</li>
+            <li>앱사용유무 (AppUseYN) : {{ $result->appUseYN ? 'true' : 'false'}}</li>
         </ul>
     </fieldset>
 </div>

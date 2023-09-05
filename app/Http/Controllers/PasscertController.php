@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use Linkhub\LinkhubException;
+use Linkhub\Barocert\BarocertException;
 use Linkhub\Barocert\PasscertService;
 use Linkhub\Barocert\BaseService;
 use Linkhub\Barocert\PassIdentity;
@@ -34,6 +35,7 @@ class PasscertController extends Controller
 
     // 로컬시스템 시간 사용여부, true-사용, false-미사용, 기본값(true)
     $this->PasscertService->UseLocalTimeYN(config('barocert.UseLocalTimeYN'));
+
   }
 
   // HTTP Get Request URI -> 함수 라우팅 처리 함수
@@ -49,17 +51,17 @@ class PasscertController extends Controller
   public function RequestIdentity(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023070000014';
+    $clientCode = '023060000044';
 
     // 본인인증 요청정보 객체
     $PassIdentity = new PassIdentity();
 
     // 수신자 휴대폰번호 - 11자 (하이픈 제외)
-    $PassIdentity->receiverHP = $this->PasscertService->encrypt('01012341234');
+    $PassIdentity->receiverHP = $this->PasscertService->encrypt('01067668440');
     // 수신자 성명 - 80자
-    $PassIdentity->receiverName = $this->PasscertService->encrypt('홍길동');
+    $PassIdentity->receiverName = $this->PasscertService->encrypt('정우석');
     // 수신자 생년월일 - 8자 (yyyyMMdd)
-    $PassIdentity->receiverBirthday = $this->PasscertService->encrypt('19700101');
+    $PassIdentity->receiverBirthday = $this->PasscertService->encrypt('19900911');
     
     // 요청 메시지 제목 - 최대 40자
     $PassIdentity->reqTitle = '본인인증 요청 메시지 제목';
@@ -108,10 +110,10 @@ class PasscertController extends Controller
   public function GetIdentityStatus(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023070000014';
+    $clientCode = '023060000044';
 
     // 본인인증 요청시 반환된 접수아이디
-    $receiptID = '02308010230700000140000000000003';
+    $receiptID = '02308220230600000440000000000022';
 
     try {
       $result = $this->PasscertService->getIdentityStatus($clientCode, $receiptID);
@@ -135,16 +137,16 @@ class PasscertController extends Controller
   public function VerifyIdentity(){
 
     // 이용기관코드, 파트너 사이트에서 확인
-    $clientCode = '023070000014';
+    $clientCode = '023060000044';
 
     // 본인인증 요청시 반환된 접수아이디
-    $receiptID = '02308010230700000140000000000003';
+    $receiptID = '02308220230600000440000000000022';
 
     // 본인인증 검증 요청정보 객체
     $PassIdentityVerify = new PassIdentityVerify();
 
-    $PassIdentityVerify->receiverHP = $this->PasscertService->encrypt('01012341234');
-    $PassIdentityVerify->receiverName = $this->PasscertService->encrypt('홍길동');
+    $PassIdentityVerify->receiverHP = $this->PasscertService->encrypt('01067668440');
+    $PassIdentityVerify->receiverName = $this->PasscertService->encrypt('정우석');
 
     try {
       $result = $this->PasscertService->verifyIdentity($clientCode, $receiptID, $PassIdentityVerify);
@@ -165,17 +167,17 @@ class PasscertController extends Controller
   public function RequestSign(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023070000014';
+    $clientCode = '023060000044';
 
     // 전자서명 요청정보 객체
     $PassSign = new PassSign();
 
     // 수신자 휴대폰번호 - 11자 (하이픈 제외)
-    $PassSign->receiverHP = $this->PasscertService->encrypt('01012341234');
+    $PassSign->receiverHP = $this->PasscertService->encrypt('01067668440');
     // 수신자 성명 - 80자
-    $PassSign->receiverName = $this->PasscertService->encrypt('홍길동');
+    $PassSign->receiverName = $this->PasscertService->encrypt('정우석');
     // 수신자 생년월일 - 8자 (yyyyMMdd)
-    $PassSign->receiverBirthday = $this->PasscertService->encrypt('19700101');
+    $PassSign->receiverBirthday = $this->PasscertService->encrypt('19900911');
 
     // 요청 메시지 제목 - 최대 40자
     $PassSign->reqTitle = '전자서명 요청 메시지 제목';
@@ -237,10 +239,10 @@ class PasscertController extends Controller
   public function GetSignStatus(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023070000014';
+    $clientCode = '023060000044';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02308010230700000140000000000006';
+    $receiptID = '02308220230600000440000000000023';
 
     try {
       $result = $this->PasscertService->getSignStatus($clientCode, $receiptID);
@@ -263,16 +265,16 @@ class PasscertController extends Controller
   public function VerifySign(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023070000014';
+    $clientCode = '023060000044';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02308010230700000140000000000006';
+    $receiptID = '02308220230600000440000000000023';
 
     // 전자서명 검증 요청정보 객체
     $PassSignVerify = new PassSignVerify();
 
-    $PassSignVerify->receiverHP = $this->PasscertService->encrypt('01012341234');
-    $PassSignVerify->receiverName = $this->PasscertService->encrypt('홍길동');
+    $PassSignVerify->receiverHP = $this->PasscertService->encrypt('01067668440');
+    $PassSignVerify->receiverName = $this->PasscertService->encrypt('정우석');
 
     try {
       $result = $this->PasscertService->VerifySign($clientCode, $receiptID, $PassSignVerify);
@@ -293,17 +295,17 @@ class PasscertController extends Controller
   public function RequestCMS(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023070000014';
+    $clientCode = '023060000044';
 
     // 출금동의 요청 정보 객체
     $PassCMS = new PassCMS();
 
     // 수신자 휴대폰번호 - 11자 (하이픈 제외)
-    $PassCMS->receiverHP = $this->PasscertService->encrypt('01012341234');
+    $PassCMS->receiverHP = $this->PasscertService->encrypt('01067668440');
     // 수신자 성명 - 80자
-    $PassCMS->receiverName = $this->PasscertService->encrypt('홍길동');
+    $PassCMS->receiverName = $this->PasscertService->encrypt('정우석');
     // 수신자 생년월일 - 8자 (yyyyMMdd)
-    $PassCMS->receiverBirthday = $this->PasscertService->encrypt('19700101');
+    $PassCMS->receiverBirthday = $this->PasscertService->encrypt('19900911');
 
     // 요청 메시지 제목 - 최대 40자
     $PassCMS->reqTitle = '출금동의 요청 메시지 제목';
@@ -323,7 +325,7 @@ class PasscertController extends Controller
     // 출금계좌번호 - 최대 31자
     $PassCMS->bankAccountNum = $this->PasscertService->encrypt('9-****-5117-58');
     // 출금계좌 예금주명 - 최대 100자
-    $PassCMS->bankAccountName = $this->PasscertService->encrypt('홍길동');
+    $PassCMS->bankAccountName = $this->PasscertService->encrypt('정우석');
     // 출금유형
     // CMS - 출금동의, OPEN_BANK - 오픈뱅킹
     $PassCMS->bankServiceType = $this->PasscertService->encrypt('CMS'); 
@@ -361,10 +363,10 @@ class PasscertController extends Controller
   public function GetCMSStatus(){
 
     // 이용기관코드, 파트너 사이트에서 확인
-    $clientCode = '023070000014';
+    $clientCode = '023060000044';
 
     // 출금동의 요청시 반환된 접수아이디
-    $receiptID = '02308010230700000140000000000008';
+    $receiptID = '02308220230600000440000000000024';
 
     try {
       $result = $this->PasscertService->getCMSStatus($clientCode, $receiptID);
@@ -387,16 +389,16 @@ class PasscertController extends Controller
   public function VerifyCMS(){
 
     // 이용기관코드, 파트너 사이트에서 확인
-    $clientCode = '023070000014';
+    $clientCode = '023060000044';
 
     // 출금동의 요청시 반환된 접수아이디
-    $receiptID = '02308010230700000140000000000008';
+    $receiptID = '02308220230600000440000000000024';
 
     // 출금동의 검증 요청정보 객체
     $PassCMSVerify = new PassCMSVerify();
 
-    $PassCMSVerify->receiverHP = $this->PasscertService->encrypt('01012341234');
-    $PassCMSVerify->receiverName = $this->PasscertService->encrypt('홍길동');
+    $PassCMSVerify->receiverHP = $this->PasscertService->encrypt('01067668440');
+    $PassCMSVerify->receiverName = $this->PasscertService->encrypt('정우석');
 
     try {
       $result = $this->PasscertService->verifyCMS($clientCode, $receiptID, $PassCMSVerify);
@@ -417,17 +419,17 @@ class PasscertController extends Controller
   public function RequestLogin(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023070000014';
+    $clientCode = '023060000044';
 
     // 간편로그인 요청정보 객체
     $PassLogin = new PassLogin();
 
     // 수신자 휴대폰번호 - 11자 (하이픈 제외)
-    $PassLogin->receiverHP = $this->PasscertService->encrypt('01012341234');
+    $PassLogin->receiverHP = $this->PasscertService->encrypt('01067668440');
     // 수신자 성명 - 80자
-    $PassLogin->receiverName = $this->PasscertService->encrypt('홍길동');
+    $PassLogin->receiverName = $this->PasscertService->encrypt('정우석');
     // 수신자 생년월일 - 8자 (yyyyMMdd)
-    $PassLogin->receiverBirthday = $this->PasscertService->encrypt('19700101');
+    $PassLogin->receiverBirthday = $this->PasscertService->encrypt('19900911');
     
     // 요청 메시지 제목 - 최대 40자
     $PassLogin->reqTitle = '간편로그인 요청 메시지 제목';
@@ -476,10 +478,10 @@ class PasscertController extends Controller
   public function GetLoginStatus(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023070000014';
+    $clientCode = '023060000044';
 
     // 간편로그인 요청시 반환된 접수아이디
-    $receiptID = '02308010230700000140000000000009';
+    $receiptID = '02308220230600000440000000000025';
 
     try {
       $result = $this->PasscertService->getLoginStatus($clientCode, $receiptID);
@@ -502,16 +504,16 @@ class PasscertController extends Controller
   public function VerifyLogin(){
 
     // 이용기관코드, 파트너 사이트에서 확인
-    $clientCode = '023070000014';
+    $clientCode = '023060000044';
 
     // 간편로그인 요청시 반환된 접수아이디
-    $receiptID = '02308010230700000140000000000009';
+    $receiptID = '02308220230600000440000000000025';
 
     // 간편로그인 검증 요청정보 객체
     $PassLoginVerify = new PassLoginVerify();
 
-    $PassLoginVerify->receiverHP = $this->PasscertService->encrypt('01012341234');
-    $PassLoginVerify->receiverName = $this->PasscertService->encrypt('홍길동');
+    $PassLoginVerify->receiverHP = $this->PasscertService->encrypt('01067668440');
+    $PassLoginVerify->receiverName = $this->PasscertService->encrypt('정우석');
 
     try {
       $result = $this->PasscertService->VerifyLogin($clientCode, $receiptID, $PassLoginVerify);

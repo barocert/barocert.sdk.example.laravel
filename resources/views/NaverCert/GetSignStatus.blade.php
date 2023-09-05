@@ -18,15 +18,11 @@
             <li>이용기관 명 (CallCenterName) : {{ $result->callCenterName }}</li>
             <li>이용기관 연락처 (CallCenterNum) : {{ $result->callCenterNum }}</li>
             <li>인증요청 메시지 제목 (ReqTitle) : {{ $result->reqTitle }}</li>
-            <li>인증분류 (AuthCategory) : {{ $result->authCategory }}</li>
             <li>복귀 URL (ReturnURL) : {{ $result->returnURL }}</li>
-            <li>원문 구분 (TokenType) : {{ $result->tokenType }}</li>
-            <li>서명요청일시 (RequestDT) : {{ $result->requestDT }}</li>
-            <li>서명조회일시 (ViewDT) : {{ $result->viewDT }}</li>
-            <li>서명완료일시 (CompleteDT) : {{ $result->completeDT }}</li>
+            <li>원문 유형 (TokenType) : {{ $result->tokenType }}</li>
             <li>서명만료일시 (ExpireDT) : {{ $result->expireDT }}</li>
-            <li>서명검증일시 (VerifyDT) : {{ $result->verifyDT }}</li>
             <li>앱스킴 (Scheme): {{ $result->scheme }}</li>
+            <li>모바일장비 유형 (DeviceOSType) : {{ $result->deviceOSType }}</li>
             <li>앱사용유무 (AppUseYN) : {{ $result->appUseYN ? 'true' : 'false'}}</li>
         </ul>
     </fieldset>

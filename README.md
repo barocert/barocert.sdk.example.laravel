@@ -7,6 +7,11 @@ KakaoCert
 4. 출금동의 API
 5. 간편로그인 API
 
+NaverCert
+1. 본인인증 API
+2. 전자서명(단건) API
+3. 전자서명(복수) API
+
 PassCert
 1. 본인인증 API
 2. 전자서명 API

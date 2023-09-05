@@ -1,0 +1,364 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+use Linkhub\LinkhubException;
+use Linkhub\Barocert\BarocertException;
+use Linkhub\Barocert\NavercertService;
+use Linkhub\Barocert\BaseService;
+use Linkhub\Barocert\NaverIdentity;
+use Linkhub\Barocert\NaverSign;
+use Linkhub\Barocert\NaverMultiSign;
+use Linkhub\Barocert\NaverMultiSignTokens;
+
+class NavercertController extends Controller
+{
+  public function __construct() {
+
+    // 통신방식 설정
+    define('LINKHUB_COMM_MODE', config('barocert.LINKHUB_COMM_MODE'));
+
+    // 네이버써트 서비스 클래스 초기화
+    $this->NavercertService = new NavercertService(config('barocert.LinkID'), config('barocert.SecretKey'));
+
+    // 인증토큰의 IP제한기능 사용여부, true-사용, false-미사용, 기본값(true)
+    $this->NavercertService->IPRestrictOnOff(config('barocert.IPRestrictOnOff'));
+
+    // 네이버써트 API 서비스 고정 IP 사용여부, true-사용, false-미사용, 기본값(false)
+    $this->NavercertService->UseStaticIP(config('barocert.UseStaticIP'));
+
+    // 로컬시스템 시간 사용여부, true-사용, false-미사용, 기본값(true)
+    $this->NavercertService->UseLocalTimeYN(config('barocert.UseLocalTimeYN'));
+  
+  }
+
+  // HTTP Get Request URI -> 함수 라우팅 처리 함수
+  public function RouteHandelerFunc(Request $request){
+    $APIName = $request->route('APIName');
+    return $this->$APIName();
+  }
+
+  /*
+   * 네이버 이용자에게 본인인증을 요청합니다.
+   * https://developers.barocert.com/reference/naver/php/identity/api#RequestIdentity
+   */
+  public function RequestIdentity(){
+
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023060000088';
+
+    // 본인인증 요청정보 객체
+    $NaverIdentity = new NaverIdentity();
+
+    // 수신자 휴대폰번호 - 11자 (하이픈 제외)
+    $NaverIdentity->receiverHP = $this->NavercertService->encrypt('01012341234');
+    // 수신자 성명 - 80자
+    $NaverIdentity->receiverName = $this->NavercertService->encrypt('홍길동');
+    // 수신자 생년월일 - 8자 (yyyyMMdd)
+    $NaverIdentity->receiverBirthday = $this->NavercertService->encrypt('19700101');
+    
+    // 고객센터 연락처 - 최대 12자
+    $NaverIdentity->callCenterNum = '1600-9854';
+    // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
+    $NaverIdentity->expireIn = 1000;
+
+    // AppToApp 인증요청 여부
+    // true - AppToApp 인증방식, false - Talk Message 인증방식
+    $NaverIdentity->appUseYN = false;
+
+    // AppToApp 인증방식에서 사용
+    // 모바일장비 유형('ANDROID', 'IOS'), 대문자 입력(대소문자 구분)
+    //$NaverIdentity->deviceOSType = 'IOS';
+
+    // AppToApp 방식 이용시, 호출할 URL
+    //$NaverIdentity->returnURL = 'navercert://sign';
+
+
+    try {
+      $result = $this->NavercertService->requestIdentity($clientCode, $NaverIdentity);
+    }
+    catch(BarocertException $re) {
+      $code = $re->getCode();
+      $message = $re->getMessage();
+      return view('Response', ['code' => $code, 'message' => $message]);
+    }
+
+    return view('NaverCert/RequestIdentity', ['result' => $result]);
+  }
+
+  /*
+   * 본인인증 요청 후 반환받은 접수아이디로 본인인증 진행 상태를 확인합니다.
+   * https://developers.barocert.com/reference/naver/php/identity/api#GetIdentityStatus
+   */
+  public function GetIdentityStatus(){
+
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023060000088';
+
+    // 전자서명 요청시 반환된 접수아이디
+    $receiptID = '02309050230600000880000000000036';
+
+    try {
+      $result = $this->NavercertService->getIdentityStatus($clientCode, $receiptID);
+    }
+    catch(BarocertException $re) {
+      $code = $re->getCode();
+      $message = $re->getMessage();
+      return view('Response', ['code' => $code, 'message' => $message]);
+    }
+
+    return view('NaverCert/GetIdentityStatus', ['result' => $result]);
+  }
+
+  /*
+   * 완료된 전자서명을 검증하고 전자서명값(signedData)을 반환 받습니다.
+   * 반환받은 전자서명값(signedData)과 [1. RequestIdentity] 함수 호출에 입력한 Token의 동일 여부를 확인하여 이용자의 본인인증 검증을 완료합니다.
+   * https://developers.barocert.com/reference/naver/php/identity/api#VerifyIdentity
+   */
+  public function VerifyIdentity(){
+
+    // 이용기관코드, 파트너 사이트에서 확인
+    $clientCode = '023060000088';
+
+    // 본인인증 요청시 반환된 접수아이디
+    $receiptID = '02309050230600000880000000000036';
+
+    try {
+      $result = $this->NavercertService->verifyIdentity($clientCode, $receiptID);
+    }
+    catch(BarocertException $re) {
+      $code = $re->getCode();
+      $message = $re->getMessage();
+      return view('Response', ['code' => $code, 'message' => $message]);
+    }
+
+    return view('NaverCert/VerifyIdentity', ['result' => $result]);
+  }
+
+  /* 
+   * 네이버 이용자에게 단건(1건) 문서의 전자서명을 요청합니다.
+   * https://developers.barocert.com/reference/naver/php/sign/api-single#RequestSign
+   */
+  public function RequestSign(){
+
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023060000088';
+
+    // 전자서명 요청정보 객체
+    $NaverSign = new NaverSign();
+
+    // 수신자 휴대폰번호 - 11자 (하이픈 제외)
+    $NaverSign->receiverHP = $this->NavercertService->encrypt('01012341234');
+    // 수신자 성명 - 80자
+    $NaverSign->receiverName = $this->NavercertService->encrypt('홍길동');
+    // 수신자 생년월일 - 8자 (yyyyMMdd)
+    $NaverSign->receiverBirthday = $this->NavercertService->encrypt('19700101');
+
+    // 인증요청 메시지 제목 - 최대 40자
+    $NaverSign->reqTitle = '전자서명단건테스트';
+    // 고객센터 연락처 - 최대 12자
+    $NaverSign->callCenterNum = '1600-9854';
+    // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
+    $NaverSign->expireIn = 1000;
+    // 요청 메시지 - 최대 500자
+    $NaverSign->reqMessage = $this->NavercertService->encrypt('본인인증 요청 메시지 내용');
+    // 서명 원문 - 원문 2,800자 까지 입력가능
+    $NaverSign->token = $this->NavercertService->encrypt('전자서명단건테스트데이터');
+    // 서명 원문 유형
+    // TEXT - 일반 텍스트, HASH - HASH 데이터
+    $NaverSign->tokenType = 'TEXT'; // TEXT, HASH
+
+    // AppToApp 인증요청 여부
+    // true - AppToApp 인증방식, false - Talk Message 인증방식
+    $NaverSign->appUseYN = false;
+
+    // AppToApp 인증방식에서 사용
+    // 모바일장비 유형('ANDROID', 'IOS'), 대문자 입력(대소문자 구분)
+    // $NaverSign->deviceOSType = 'IOS';
+
+    // AppToApp 방식 이용시, 호출할 URL
+    // $NaverSign->returnURL = 'navercert://sign';
+
+    try {
+      $result = $this->NavercertService->requestSign($clientCode, $NaverSign);
+    }
+    catch(BarocertException $re) {
+      $code = $re->getCode();
+      $message = $re->getMessage();
+      return view('Response', ['code' => $code, 'message' => $message]);
+    }
+
+    return view('NaverCert/RequestSign', ['result' => $result]);
+  }
+
+  /*
+   * 전자서명(단건) 요청 후 반환받은 접수아이디로 인증 진행 상태를 확인합니다.
+   * https://developers.barocert.com/reference/naver/php/sign/api-single#GetSignStatus
+   */
+  public function GetSignStatus(){
+
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023060000088';
+
+    // 전자서명 요청시 반환된 접수아이디
+    $receiptID = '02309050230600000880000000000037';
+
+    try {
+      $result = $this->NavercertService->getSignStatus($clientCode, $receiptID);
+    }
+    catch(BarocertException $re) {
+      $code = $re->getCode();
+      $message = $re->getMessage();
+      return view('Response', ['code' => $code, 'message' => $message]);
+    }
+
+    return view('NaverCert/GetSignStatus', ['result' => $result]);
+  }
+
+  /*
+   * 완료된 전자서명을 검증하고 전자서명값(signedData)을 반환 받습니다.
+   * 네이버 보안정책에 따라 검증 API는 1회만 호출할 수 있습니다. 재시도시 오류가 반환됩니다.
+   * https://developers.barocert.com/reference/naver/php/sign/api-single#VerifySign
+   */
+  public function VerifySign(){
+
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023060000088';
+
+    // 전자서명 요청시 반환된 접수아이디
+    $receiptID = '02309050230600000880000000000037';
+
+    try {
+      $result = $this->NavercertService->VerifySign($clientCode, $receiptID);
+    }
+    catch(BarocertException $re) {
+      $code = $re->getCode();
+      $message = $re->getMessage();
+      return view('Response', ['code' => $code, 'message' => $message]);
+    }
+
+    return view('NaverCert/VerifySign', ['result' => $result]);
+  }
+
+  /*
+   * 네이버 이용자에게 복수(최대 50건) 문서의 전자서명을 요청합니다.
+   * https://developers.barocert.com/reference/naver/php/sign/api-multi#RequestMultiSign
+   */
+  public function RequestMultiSign(){
+
+     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023060000088';
+
+    // 전자서명 요청정보 객체
+    $NaverMultiSign = new NaverMultiSign();
+
+    // 수신자 휴대폰번호 - 11자 (하이픈 제외)
+    $NaverMultiSign->receiverHP = $this->NavercertService->encrypt('01012341234');
+    // 수신자 성명 - 80자
+    $NaverMultiSign->receiverName = $this->NavercertService->encrypt('홍길동');
+    // 수신자 생년월일 - 8자 (yyyyMMdd)
+    $NaverMultiSign->receiverBirthday = $this->NavercertService->encrypt('19700101');
+
+    // 인증요청 메시지 제목 - 최대 40자
+    $NaverMultiSign->reqTitle = '전자서명복수테스트';
+    // 고객센터 연락처 - 최대 12자
+    $NaverMultiSign->callCenterNum = '1600-9854';
+    // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
+    $NaverMultiSign->expireIn = 1000;
+    // 요청 메시지 - 최대 500자
+    $NaverMultiSign->reqMessage = $this->NavercertService->encrypt('전자서명 인증요청 메시지');
+
+    // 개별문서 등록 - 최대 50 건
+    // 개별 요청 정보 객체
+    $NaverMultiSign->tokens = array();
+    
+    $NaverMultiSign->tokens[] = new NaverMultiSignTokens();
+    // 서명 원문 유형
+    // TEXT - 일반 텍스트, HASH - HASH 데이터
+    $NaverMultiSign->tokens[0]->tokenType = "TEXT";
+    // 서명 원문 - 원문 2,800자 까지 입력가능
+    $NaverMultiSign->tokens[0]->token = $this->NavercertService->encrypt("전자서명복수테스트데이터1");
+
+    $NaverMultiSign->tokens[] = new NaverMultiSignTokens();
+    // 서명 원문 유형
+    // TEXT - 일반 텍스트, HASH - HASH 데이터
+    $NaverMultiSign->tokens[1]->tokenType = "TEXT";
+    // 서명 원문 - 원문 2,800자 까지 입력가능
+    $NaverMultiSign->tokens[1]->token = $this->NavercertService->encrypt("전자서명복수테스트데이터2");
+
+    // AppToApp 인증요청 여부
+    // true - AppToApp 인증방식, false - Talk Message 인증방식
+    $NaverMultiSign->appUseYN = false;
+
+    // AppToApp 인증방식에서 사용
+    // 모바일장비 유형('ANDROID', 'IOS'), 대문자 입력(대소문자 구분)
+    // $PassIdentity->deviceOSType = 'IOS';
+
+    // AppToApp 방식 이용시, 호출할 URL
+    // $NaverMultiSign->returnURL = 'navercert://sign';
+
+    try {
+      $result = $this->NavercertService->requestMultiSign($clientCode, $NaverMultiSign);
+    }
+    catch(BarocertException $re) {
+      $code = $re->getCode();
+      $message = $re->getMessage();
+      return view('Response', ['code' => $code, 'message' => $message]);
+    }
+
+    return view('NaverCert/RequestMultiSign', ['result' => $result]);
+  }
+
+  /*
+   * 전자서명(복수) 요청 후 반환받은 접수아이디로 인증 진행 상태를 확인합니다.
+   * https://developers.barocert.com/reference/naver/php/sign/api-multi#GetMultiSignStatus
+   */
+  public function GetMultiSignStatus(){
+
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023060000088';
+
+    // 전자서명 요청시 반환된 접수아이디
+    $receiptID = '02309050230600000880000000000038';
+
+    try {
+      $result = $this->NavercertService->getMultiSignStatus($clientCode, $receiptID);
+    }
+    catch(BarocertException $re) {
+      $code = $re->getCode();
+      $message = $re->getMessage();
+      return view('Response', ['code' => $code, 'message' => $message]);
+    }
+
+    return view('NaverCert/GetMultiSignStatus', ['result' => $result]);
+  }
+
+  /*
+   * 완료된 전자서명을 검증하고 전자서명값(signedData)을 반환 받습니다.
+   * 네이버 보안정책에 따라 검증 API는 1회만 호출할 수 있습니다. 재시도시 오류가 반환됩니다.
+   * https://developers.barocert.com/reference/naver/php/sign/api-multi#VerifyMultiSign
+   */
+  public function VerifyMultiSign(){
+
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023060000088';
+
+    // 전자서명 요청시 반환된 접수아이디
+    $receiptID = '02309050230600000880000000000038';
+
+    try {
+      $result = $this->NavercertService->verifyMultiSign($clientCode, $receiptID);
+    }
+    catch(BarocertException $re) {
+      $code = $re->getCode();
+      $message = $re->getMessage();
+      return view('Response', ['code' => $code, 'message' => $message]);
+    }
+
+    return view('NaverCert/VerifyMultiSign', ['result' => $result]);
+  }
+  
+
+}

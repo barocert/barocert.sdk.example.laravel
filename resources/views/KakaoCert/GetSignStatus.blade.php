@@ -27,7 +27,7 @@
             <li>서명만료일시 (ExpireDT) : {{ $result->expireDT }}</li>
             <li>서명검증일시 (VerifyDT) : {{ $result->verifyDT }}</li>
             <li>앱스킴 (Scheme): {{ $result->scheme }}</li>
-            <li>앱사용유무 (AppUseYN) : {{ $result->appUseYN }}</li>
+            <li>앱사용유무 (AppUseYN) : {{ $result->appUseYN ? 'true' : 'false'}}</li>
         </ul>
     </fieldset>
 </div>

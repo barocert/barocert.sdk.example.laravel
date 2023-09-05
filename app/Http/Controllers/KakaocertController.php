@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use Linkhub\LinkhubException;
+use Linkhub\Barocert\BarocertException;
 use Linkhub\Barocert\KakaocertService;
 use Linkhub\Barocert\BaseService;
 use Linkhub\Barocert\KakaoIdentity;
