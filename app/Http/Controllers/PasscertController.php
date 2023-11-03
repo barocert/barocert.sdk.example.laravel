@@ -63,13 +63,13 @@ class PasscertController extends Controller
     // 요청 메시지 제목 - 최대 40자
     $PassIdentity->reqTitle = '본인인증 요청 메시지 제목';
     // 요청 메시지 - 최대 500자
-    $PassIdentity->reqMessage = $this->PasscertService->encrypt('본인인증 요청 메시지 내용');
+    $PassIdentity->reqMessage = $this->PasscertService->encrypt('본인인증 요청 메시지');
     // 고객센터 연락처 - 최대 12자
     $PassIdentity->callCenterNum = '1600-9854';
     // 요청 만료시간 - 최대 1,000(초)까지 입력 가능
     $PassIdentity->expireIn = 1000;
     // 서명 원문 - 최대 2,800자 까지 입력가능
-    $PassIdentity->token = $this->PasscertService->encrypt('본인인증 요청 토큰');
+    $PassIdentity->token = $this->PasscertService->encrypt('본인인증 요청 원문');
 
     // 사용자 동의 필요 여부
     $PassIdentity->userAgreementYN = true;
@@ -179,13 +179,13 @@ class PasscertController extends Controller
     // 요청 메시지 제목 - 최대 40자
     $PassSign->reqTitle = '전자서명 요청 메시지 제목';
     // 요청 메시지 - 최대 500자
-    $PassSign->reqMessage = $this->PasscertService->encrypt('전자서명 요청 메시지 내용');
+    $PassSign->reqMessage = $this->PasscertService->encrypt('전자서명 요청 메시지');
     // 고객센터 연락처 - 최대 12자
     $PassSign->callCenterNum = '1600-9854';
     // 요청 만료시간 - 최대 1,000(초)까지 입력 가능
     $PassSign->expireIn = 1000;
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $PassSign->token = $this->PasscertService->encrypt('전자서명 요청 토큰');
+    $PassSign->token = $this->PasscertService->encrypt('전자서명 요청 원문');
     // 서명 원문 유형
     // 'TEXT' - 일반 텍스트, 'HASH' - HASH 데이터, 'URL' - URL 데이터
     // 원본데이터(originalTypeCode, originalURL, originalFormatCode) 입력시 'TEXT'사용 불가
@@ -307,7 +307,7 @@ class PasscertController extends Controller
     // 요청 메시지 제목 - 최대 40자
     $PassCMS->reqTitle = '출금동의 요청 메시지 제목';
     // 요청 메시지 - 최대 500자
-    $PassCMS->reqMessage = $this->PasscertService->encrypt('출금동의 요청 메시지 내용');
+    $PassCMS->reqMessage = $this->PasscertService->encrypt('출금동의 요청 메시지');
     // 고객센터 연락처 - 최대 12자
     $PassCMS->callCenterNum = '1600-9854';
     // 요청 만료시간 - 최대 1,000(초)까지 입력 가능
@@ -431,13 +431,13 @@ class PasscertController extends Controller
     // 요청 메시지 제목 - 최대 40자
     $PassLogin->reqTitle = '간편로그인 요청 메시지 제목';
     // 요청 메시지 - 최대 500자
-    $PassLogin->reqMessage = $this->PasscertService->encrypt('간편로그인 요청 메시지 내용');
+    $PassLogin->reqMessage = $this->PasscertService->encrypt('간편로그인 요청 메시지');
     // 고객센터 연락처 - 최대 12자
     $PassLogin->callCenterNum = '1600-9854';
     // 요청 만료시간 - 최대 1,000(초)까지 입력 가능
     $PassLogin->expireIn = 1000;
     // 서명 원문 - 최대 2,800자 까지 입력가능
-    $PassLogin->token = $this->PasscertService->encrypt('간편로그인 요청 토큰');
+    $PassLogin->token = $this->PasscertService->encrypt('간편로그인 요청 원문');
 
     // 사용자 동의 필요 여부
     $PassLogin->userAgreementYN = true;

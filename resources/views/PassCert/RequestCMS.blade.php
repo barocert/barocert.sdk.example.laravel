@@ -11,7 +11,7 @@
     <fieldset class="fieldset1">
         <legend>{{\Request::fullUrl()}}</legend>
         <ul>
-            <li>접수아이디 (receiptID) : {{ $result->receiptId }}</li>
+            <li>접수아이디 (receiptID) : {{ $result->receiptID }}</li>
             <li>앱스킴 (scheme): {{ $result->scheme }}</li>
             <li>앱다운로드URL (marketUrl): {{ $result->marketUrl }}</li>
         </ul>

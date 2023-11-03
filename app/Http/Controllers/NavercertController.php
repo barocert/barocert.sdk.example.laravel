@@ -154,15 +154,15 @@ class NavercertController extends Controller
     $NaverSign->receiverBirthday = $this->NavercertService->encrypt('19700101');
 
     // 인증요청 메시지 제목 - 최대 40자
-    $NaverSign->reqTitle = '전자서명단건테스트';
+    $NaverSign->reqTitle = '전자서명(단건) 요청 메시지 제목';
     // 고객센터 연락처 - 최대 12자
     $NaverSign->callCenterNum = '1600-9854';
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
     $NaverSign->expireIn = 1000;
     // 요청 메시지 - 최대 500자
-    $NaverSign->reqMessage = $this->NavercertService->encrypt('본인인증 요청 메시지 내용');
+    $NaverSign->reqMessage = $this->NavercertService->encrypt('전자서명(단건) 요청 메시지');
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $NaverSign->token = $this->NavercertService->encrypt('전자서명단건테스트데이터');
+    $NaverSign->token = $this->NavercertService->encrypt('전자서명(단건) 요청 원문');
     // 서명 원문 유형
     // TEXT - 일반 텍스트, HASH - HASH 데이터
     $NaverSign->tokenType = 'TEXT'; // TEXT, HASH
@@ -259,13 +259,13 @@ class NavercertController extends Controller
     $NaverMultiSign->receiverBirthday = $this->NavercertService->encrypt('19700101');
 
     // 인증요청 메시지 제목 - 최대 40자
-    $NaverMultiSign->reqTitle = '전자서명복수테스트';
+    $NaverMultiSign->reqTitle = '전자서명(복수) 요청 메시지 제목';
     // 고객센터 연락처 - 최대 12자
     $NaverMultiSign->callCenterNum = '1600-9854';
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
     $NaverMultiSign->expireIn = 1000;
     // 요청 메시지 - 최대 500자
-    $NaverMultiSign->reqMessage = $this->NavercertService->encrypt('전자서명 인증요청 메시지');
+    $NaverMultiSign->reqMessage = $this->NavercertService->encrypt('전자서명(복수) 요청 메시지');
 
     // 개별문서 등록 - 최대 50 건
     // 개별 요청 정보 객체
@@ -276,14 +276,14 @@ class NavercertController extends Controller
     // TEXT - 일반 텍스트, HASH - HASH 데이터
     $NaverMultiSign->tokens[0]->tokenType = "TEXT";
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $NaverMultiSign->tokens[0]->token = $this->NavercertService->encrypt("전자서명복수테스트데이터1");
+    $NaverMultiSign->tokens[0]->token = $this->NavercertService->encrypt("전자서명(복수) 요청 원문 1");
 
     $NaverMultiSign->tokens[] = new NaverMultiSignTokens();
     // 서명 원문 유형
     // TEXT - 일반 텍스트, HASH - HASH 데이터
     $NaverMultiSign->tokens[1]->tokenType = "TEXT";
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $NaverMultiSign->tokens[1]->token = $this->NavercertService->encrypt("전자서명복수테스트데이터2");
+    $NaverMultiSign->tokens[1]->token = $this->NavercertService->encrypt("전자서명(복수) 요청 원문 2");
 
     // AppToApp 인증요청 여부
     // true - AppToApp 인증방식, false - Talk Message 인증방식

@@ -56,11 +56,11 @@ class KakaocertController extends Controller
     $KakaoIdentity->receiverBirthday = $this->KakaocertService->encrypt('19700101');
     
     // 인증요청 메시지 제목 - 최대 40자
-    $KakaoIdentity->reqTitle = '인증요청 메시지 제목란';
+    $KakaoIdentity->reqTitle = '본인인증 요청 메시지 제목';
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
     $KakaoIdentity->expireIn = 1000;
     // 서명 원문 - 최대 2,800자 까지 입력가능
-    $KakaoIdentity->token = $this->KakaocertService->encrypt('본인인증요청토큰');
+    $KakaoIdentity->token = $this->KakaocertService->encrypt('본인인증 요청 원문');
 
     // AppToApp 인증요청 여부
     // true - AppToApp 인증방식, false - Talk Message 인증방식
@@ -151,11 +151,11 @@ class KakaocertController extends Controller
     $KakaoSign->receiverBirthday = $this->KakaocertService->encrypt('19700101');
 
     // 인증요청 메시지 제목 - 최대 40자
-    $KakaoSign->reqTitle = '전자서명단건테스트';
+    $KakaoSign->reqTitle = '전자서명(단건) 요청 메시지 제목';
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
     $KakaoSign->expireIn = 1000;
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $KakaoSign->token = $this->KakaocertService->encrypt('전자서명단건테스트데이터');
+    $KakaoSign->token = $this->KakaocertService->encrypt('전자서명(단건) 요청 원문');
     // 서명 원문 유형
     // TEXT - 일반 텍스트, HASH - HASH 데이터
     $KakaoSign->tokenType = 'TEXT'; // TEXT, HASH
@@ -248,7 +248,7 @@ class KakaocertController extends Controller
     $KakaoMultiSign->receiverBirthday = $this->KakaocertService->encrypt('19700101');
 
     // 인증요청 메시지 제목 - 최대 40자
-    $KakaoMultiSign->reqTitle = '전자서명복수테스트';
+    $KakaoMultiSign->reqTitle = '전자서명(복수) 요청 메시지 제목';
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
     $KakaoMultiSign->expireIn = 1000;
 
@@ -258,15 +258,15 @@ class KakaocertController extends Controller
     
     $KakaoMultiSign->tokens[] = new KakaoMultiSignTokens();
     // 인증요청 메시지 제목 - 최대 40자
-    $KakaoMultiSign->tokens[0]->reqTitle = "전자서명복수문서테스트1";
+    $KakaoMultiSign->tokens[0]->reqTitle = "전자서명(복수) 요청 메시지 제목 1";
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $KakaoMultiSign->tokens[0]->token = $this->KakaocertService->encrypt("전자서명복수테스트데이터1");
+    $KakaoMultiSign->tokens[0]->token = $this->KakaocertService->encrypt("전자서명(복수) 요청 원문 1");
 
     $KakaoMultiSign->tokens[] = new KakaoMultiSignTokens();
     // 인증요청 메시지 제목 - 최대 40자
-    $KakaoMultiSign->tokens[1]->reqTitle = "전자서명복수문서테스트2";
+    $KakaoMultiSign->tokens[1]->reqTitle = "전자서명(복수) 요청 메시지 제목 2";
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $KakaoMultiSign->tokens[1]->token = $this->KakaocertService->encrypt("전자서명복수테스트데이터2");
+    $KakaoMultiSign->tokens[1]->token = $this->KakaocertService->encrypt("전자서명(복수) 요청 원문 2");
 
     // 서명 원문 유형
     // TEXT - 일반 텍스트, HASH - HASH 데이터
@@ -360,7 +360,7 @@ class KakaocertController extends Controller
       $KakaoCMS->receiverBirthday = $this->KakaocertService->encrypt('19700101');
 
       // 인증요청 메시지 제목 - 최대 40자
-      $KakaoCMS->reqTitle = '인증요청 메시지 제공란';
+      $KakaoCMS->reqTitle = '출금동의 요청 메시지 제목';
       // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
       $KakaoCMS->expireIn = 1000;
       // 청구기관명 - 최대 100자
