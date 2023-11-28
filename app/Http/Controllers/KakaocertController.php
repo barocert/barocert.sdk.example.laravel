@@ -57,8 +57,8 @@ class KakaocertController extends Controller
     
     // 인증요청 메시지 제목 - 최대 40자
     $KakaoIdentity->reqTitle = '본인인증 요청 메시지 제목';
-    // 상세 설명 - 최대 500자
-    $KakaoIdentity->extraMessage = $this->KakaocertService->encrypt('본인인증 상세 설명');
+    // 커스텀 메시지 - 최대 500자
+    $KakaoIdentity->extraMessage = $this->KakaocertService->encrypt('본인인증 커스텀 메시지');
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
     $KakaoIdentity->expireIn = 1000;
     // 서명 원문 - 최대 40자 까지 입력가능
@@ -154,8 +154,8 @@ class KakaocertController extends Controller
 
     // 인증요청 메시지 제목 - 최대 40자
     $KakaoSign->signTitle = '전자서명(단건) 요청 메시지 제목';
-    // 상세 설명 - 최대 500자
-    $KakaoSign->extraMessage = $this->KakaocertService->encrypt('전자서명(단건) 상세 설명');
+    // 커스텀 메시지 - 최대 500자
+    $KakaoSign->extraMessage = $this->KakaocertService->encrypt('전자서명(단건) 커스텀 메시지');
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
     $KakaoSign->expireIn = 1000;
     // 서명 원문 - 원문 2,800자 까지 입력가능
@@ -253,8 +253,8 @@ class KakaocertController extends Controller
 
     // 인증요청 메시지 제목 - 최대 40자
     $KakaoMultiSign->reqTitle = '전자서명(복수) 요청 메시지 제목';
-    // 상세 설명 - 최대 500자
-    $KakaoMultiSign->extraMessage = $this->KakaocertService->encrypt('전자서명(복수) 상세 설명');
+    // 커스텀 메시지 - 최대 500자
+    $KakaoMultiSign->extraMessage = $this->KakaocertService->encrypt('전자서명(복수) 커스텀 메시지');
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
     $KakaoMultiSign->expireIn = 1000;
 
@@ -367,8 +367,8 @@ class KakaocertController extends Controller
 
       // 인증요청 메시지 제목 - 최대 40자
       $KakaoCMS->reqTitle = '출금동의 요청 메시지 제목';
-      // 상세 설명 - 최대 500자
-      $KakaoCMS->extraMessage = $this->KakaocertService->encrypt('출금동의 상세 설명');
+      // 커스텀 메시지 - 최대 500자
+      $KakaoCMS->extraMessage = $this->KakaocertService->encrypt('출금동의 커스텀 메시지');
       // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
       $KakaoCMS->expireIn = 1000;
       // 청구기관명 - 최대 100자
