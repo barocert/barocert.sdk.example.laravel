@@ -44,7 +44,7 @@ class NavercertController extends Controller
   public function RequestIdentity(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023060000088';
+    $clientCode = '023090000021';
 
     // 본인인증 요청정보 객체
     $NaverIdentity = new NaverIdentity();
@@ -70,6 +70,7 @@ class NavercertController extends Controller
     //$NaverIdentity->deviceOSType = 'IOS';
 
     // AppToApp 방식 이용시, 호출할 URL
+    // "http", "https"등의 웹프로토콜 사용 불가
     //$NaverIdentity->returnURL = 'navercert://sign';
 
 
@@ -92,10 +93,10 @@ class NavercertController extends Controller
   public function GetIdentityStatus(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023060000088';
+    $clientCode = '023090000021';
 
-    // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02309050230600000880000000000036';
+    // 본인인증 요청시 반환된 접수아이디
+    $receiptID = '02309050230900000210000000000036';
 
     try {
       $result = $this->NavercertService->getIdentityStatus($clientCode, $receiptID);
@@ -117,10 +118,10 @@ class NavercertController extends Controller
   public function VerifyIdentity(){
 
     // 이용기관코드, 파트너 사이트에서 확인
-    $clientCode = '023060000088';
+    $clientCode = '023090000021';
 
     // 본인인증 요청시 반환된 접수아이디
-    $receiptID = '02309050230600000880000000000036';
+    $receiptID = '02309050230900000210000000000036';
 
     try {
       $result = $this->NavercertService->verifyIdentity($clientCode, $receiptID);
@@ -141,7 +142,7 @@ class NavercertController extends Controller
   public function RequestSign(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023060000088';
+    $clientCode = '023090000021';
 
     // 전자서명 요청정보 객체
     $NaverSign = new NaverSign();
@@ -161,11 +162,16 @@ class NavercertController extends Controller
     $NaverSign->expireIn = 1000;
     // 요청 메시지 - 최대 500자
     $NaverSign->reqMessage = $this->NavercertService->encrypt('전자서명(단건) 요청 메시지');
-    // 서명 원문 - 원문 2,800자 까지 입력가능
-    $NaverSign->token = $this->NavercertService->encrypt('전자서명(단건) 요청 원문');
+    
     // 서명 원문 유형
     // TEXT - 일반 텍스트, HASH - HASH 데이터
-    $NaverSign->tokenType = 'TEXT'; // TEXT, HASH
+    $NaverSign->tokenType = 'TEXT';
+    // 서명 원문 - 원문 2,800자 까지 입력가능
+    $NaverSign->token = $NavercertService->encrypt('전자서명(단건) 요청 원문');
+    // 서명 원문 유형
+    // $NaverSign->tokenType = 'HASH';
+    // 서명 원문 유형이 HASH인 경우, 원문은 SHA-256, Base64 URL Safe No Padding을 사용
+    // $NaverSign->token = $NavercertService->encrypt($NavercertService->sha256('전자서명(단건) 요청 원문'));
 
     // AppToApp 인증요청 여부
     // true - AppToApp 인증방식, false - Talk Message 인증방식
@@ -176,6 +182,7 @@ class NavercertController extends Controller
     // $NaverSign->deviceOSType = 'IOS';
 
     // AppToApp 방식 이용시, 호출할 URL
+    // "http", "https"등의 웹프로토콜 사용 불가
     // $NaverSign->returnURL = 'navercert://sign';
 
     try {
@@ -197,10 +204,10 @@ class NavercertController extends Controller
   public function GetSignStatus(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023060000088';
+    $clientCode = '023090000021';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02309050230600000880000000000037';
+    $receiptID = '02309050230900000210000000000037';
 
     try {
       $result = $this->NavercertService->getSignStatus($clientCode, $receiptID);
@@ -222,10 +229,10 @@ class NavercertController extends Controller
   public function VerifySign(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023060000088';
+    $clientCode = '023090000021';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02309050230600000880000000000037';
+    $receiptID = '02309050230900000210000000000037';
 
     try {
       $result = $this->NavercertService->VerifySign($clientCode, $receiptID);
@@ -246,7 +253,7 @@ class NavercertController extends Controller
   public function RequestMultiSign(){
 
      // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023060000088';
+    $clientCode = '023090000021';
 
     // 전자서명 요청정보 객체
     $NaverMultiSign = new NaverMultiSign();
@@ -274,16 +281,24 @@ class NavercertController extends Controller
     $NaverMultiSign->tokens[] = new NaverMultiSignTokens();
     // 서명 원문 유형
     // TEXT - 일반 텍스트, HASH - HASH 데이터
-    $NaverMultiSign->tokens[0]->tokenType = "TEXT";
+    $NaverMultiSign->tokens[0]->tokenType = 'TEXT'; 
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $NaverMultiSign->tokens[0]->token = $this->NavercertService->encrypt("전자서명(복수) 요청 원문 1");
+    $NaverMultiSign->tokens[0]->token = $NavercertService->encrypt("전자서명(복수) 요청 원문 1");
+    // 서명 원문 유형
+    // $NaverMultiSign->tokens[0]->tokenType = 'HASH'; 
+    // 서명 원문 유형이 HASH인 경우, 원문은 SHA-256, Base64 URL Safe No Padding을 사용
+    // $NaverMultiSign->tokens[0]->token = $NavercertService->encrypt($NavercertService->sha256("전자서명(복수) 요청 원문 1"));
 
     $NaverMultiSign->tokens[] = new NaverMultiSignTokens();
     // 서명 원문 유형
     // TEXT - 일반 텍스트, HASH - HASH 데이터
-    $NaverMultiSign->tokens[1]->tokenType = "TEXT";
+    $NaverMultiSign->tokens[1]->tokenType = 'TEXT'; 
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $NaverMultiSign->tokens[1]->token = $this->NavercertService->encrypt("전자서명(복수) 요청 원문 2");
+    $NaverMultiSign->tokens[1]->token = $NavercertService->encrypt("전자서명(복수) 요청 원문 2");
+    // 서명 원문 유형
+    // $NaverMultiSign->tokens[1]->tokenType = 'HASH'; 
+    // 서명 원문 유형이 HASH인 경우, 원문은 SHA-256, Base64 URL Safe No Padding을 사용
+    // $NaverMultiSign->tokens[1]->token = $NavercertService->encrypt($NavercertService->sha256("전자서명(복수) 요청 원문 2"));
 
     // AppToApp 인증요청 여부
     // true - AppToApp 인증방식, false - Talk Message 인증방식
@@ -294,6 +309,7 @@ class NavercertController extends Controller
     // $PassIdentity->deviceOSType = 'IOS';
 
     // AppToApp 방식 이용시, 호출할 URL
+    // "http", "https"등의 웹프로토콜 사용 불가
     // $NaverMultiSign->returnURL = 'navercert://sign';
 
     try {
@@ -315,10 +331,10 @@ class NavercertController extends Controller
   public function GetMultiSignStatus(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023060000088';
+    $clientCode = '023090000021';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02309050230600000880000000000038';
+    $receiptID = '02309050230900000210000000000038';
 
     try {
       $result = $this->NavercertService->getMultiSignStatus($clientCode, $receiptID);
@@ -340,10 +356,10 @@ class NavercertController extends Controller
   public function VerifyMultiSign(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023060000088';
+    $clientCode = '023090000021';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02309050230600000880000000000038';
+    $receiptID = '02309050230900000210000000000038';
 
     try {
       $result = $this->NavercertService->verifyMultiSign($clientCode, $receiptID);
@@ -356,6 +372,118 @@ class NavercertController extends Controller
 
     return view('NaverCert/VerifyMultiSign', ['result' => $result]);
   }
-  
+
+  /*
+   * 네이버 이용자에게 자동이체 출금동의를 요청합니다.
+   * https://developers.barocert.com/reference/naver/php/cms/api#RequestCMS
+   */
+  public function RequestCMS(){
+
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023090000021';
+
+    // 출금동의 요청정보 객체
+    $NaverCMS = new NaverCMS();
+
+    // 수신자 휴대폰번호 - 11자 (하이픈 제외)
+    $NaverCMS->receiverHP = $NavercertService->encrypt('01067668440');
+    // 수신자 성명 - 80자
+    $NaverCMS->receiverName = $NavercertService->encrypt('정우석');
+    // 수신자 생년월일 - 8자 (yyyyMMdd)
+    $NaverCMS->receiverBirthday = $NavercertService->encrypt('19900911');
+    
+    // 인증요청 메시지 제목
+    $NaverCMS->reqTitle = "출금동의 요청 메시지 제목";
+    // 인증요청 메시지
+    $NaverCMS->reqMessage = $NavercertService->encrypt("출금동의 요청 메시지");
+    // 고객센터 연락처 - 최대 12자
+    $NaverCMS->callCenterNum = '1600-9854';
+    // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
+    $NaverCMS->expireIn = 1000;
+
+    // 청구기관명
+    $NaverCMS->requestCorp = $NavercertService->encrypt("청구기관");
+    // 출금은행명
+    $NaverCMS->bankName = $NavercertService->encrypt("출금은행");
+    // 출금계좌번호
+    $NaverCMS->bankAccountNum = $NavercertService->encrypt("123-456-7890");
+    // 출금계좌 예금주명
+    $NaverCMS->bankAccountName = $NavercertService->encrypt("홍길동");
+    // 출금계좌 예금주 생년월일
+    $NaverCMS->bankAccountBirthday = $NavercertService->encrypt("19700101");
+
+    // AppToApp 인증요청 여부
+    // true - AppToApp 인증방식, false - Talk Message 인증방식
+    $NaverCMS->appUseYN = false;
+
+    // AppToApp 인증방식에서 사용
+    // 모바일장비 유형('ANDROID', 'IOS'), 대문자 입력(대소문자 구분)
+    // $NaverCMS->deviceOSType = 'IOS';
+
+    // AppToApp 방식 이용시, 호출할 URL
+    // "http", "https"등의 웹프로토콜 사용 불가
+    // $NaverCMS->returnURL = 'navercert://cms';
+
+    try {
+      $result = $this->NavercertService->requestCMS($clientCode, $NaverCMS);
+    }
+    catch(BarocertException $re) {
+      $code = $re->getCode();
+      $message = $re->getMessage();
+      return view('Response', ['code' => $code, 'message' => $message]);
+    }
+
+    return view('NaverCert/RequestCMS', ['result' => $result]);
+  }
+
+  /*
+   * 자동이체 출금동의 요청 후 반환받은 접수아이디로 인증 진행 상태를 확인합니다.
+   * https://developers.barocert.com/reference/naver/php/cms/api#GetCMSStatus
+   */
+  public function GetCMSStatus(){
+
+    // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
+    $clientCode = '023090000021';
+
+    // 출금동의 요청시 반환된 접수아이디
+    $receiptID = '02309050230900000210000000000036';
+
+    try {
+      $result = $this->NavercertService->getCMSStatus($clientCode, $receiptID);
+    }
+    catch(BarocertException $re) {
+      $code = $re->getCode();
+      $message = $re->getMessage();
+      return view('Response', ['code' => $code, 'message' => $message]);
+    }
+
+    return view('NaverCert/GetCMSStatus', ['result' => $result]);
+  }
+
+  /*
+   * 완료된 전자서명을 검증하고 전자서명값(signedData)을 반환 받습니다.
+   * 네이버 보안정책에 따라 검증 API는 1회만 호출할 수 있습니다. 재시도시 오류가 반환됩니다.
+   * 전자서명 만료일시 이후에 검증 API를 호출하면 오류가 반환됩니다.
+   * https://developers.barocert.com/reference/naver/php/cms/api#VerifyCMS
+   */
+  public function VerifyCMS(){
+
+    // 이용기관코드, 파트너 사이트에서 확인
+    $clientCode = '023090000021';
+
+    // 출금동의 요청시 반환된 접수아이디
+    $receiptID = '02309050230900000210000000000036';
+
+    try {
+      $result = $this->NavercertService->verifyCMS($clientCode, $receiptID);
+    }
+    catch(BarocertException $re) {
+      $code = $re->getCode();
+      $message = $re->getMessage();
+      return view('Response', ['code' => $code, 'message' => $message]);
+    }
+
+    return view('NaverCert/VerifyCMS', ['result' => $result]);
+  }
 
 }

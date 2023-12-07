@@ -48,7 +48,7 @@ class PasscertController extends Controller
   public function RequestIdentity(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023060000044';
+    $clientCode = '023070000014';
 
     // 본인인증 요청정보 객체
     $PassIdentity = new PassIdentity();
@@ -107,10 +107,10 @@ class PasscertController extends Controller
   public function GetIdentityStatus(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023060000044';
+    $clientCode = '023070000014';
 
     // 본인인증 요청시 반환된 접수아이디
-    $receiptID = '02308220230600000440000000000022';
+    $receiptID = '02308220230700000140000000000022';
 
     try {
       $result = $this->PasscertService->getIdentityStatus($clientCode, $receiptID);
@@ -134,10 +134,10 @@ class PasscertController extends Controller
   public function VerifyIdentity(){
 
     // 이용기관코드, 파트너 사이트에서 확인
-    $clientCode = '023060000044';
+    $clientCode = '023070000014';
 
     // 본인인증 요청시 반환된 접수아이디
-    $receiptID = '02308220230600000440000000000022';
+    $receiptID = '02308220230700000140000000000022';
 
     // 본인인증 검증 요청정보 객체
     $PassIdentityVerify = new PassIdentityVerify();
@@ -164,7 +164,7 @@ class PasscertController extends Controller
   public function RequestSign(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023060000044';
+    $clientCode = '023070000014';
 
     // 전자서명 요청정보 객체
     $PassSign = new PassSign();
@@ -236,10 +236,10 @@ class PasscertController extends Controller
   public function GetSignStatus(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023060000044';
+    $clientCode = '023070000014';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02308220230600000440000000000023';
+    $receiptID = '02308220230700000140000000000023';
 
     try {
       $result = $this->PasscertService->getSignStatus($clientCode, $receiptID);
@@ -262,10 +262,10 @@ class PasscertController extends Controller
   public function VerifySign(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023060000044';
+    $clientCode = '023070000014';
 
     // 전자서명 요청시 반환된 접수아이디
-    $receiptID = '02308220230600000440000000000023';
+    $receiptID = '02308220230700000140000000000023';
 
     // 전자서명 검증 요청정보 객체
     $PassSignVerify = new PassSignVerify();
@@ -292,7 +292,7 @@ class PasscertController extends Controller
   public function RequestCMS(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023060000044';
+    $clientCode = '023070000014';
 
     // 출금동의 요청 정보 객체
     $PassCMS = new PassCMS();
@@ -360,10 +360,10 @@ class PasscertController extends Controller
   public function GetCMSStatus(){
 
     // 이용기관코드, 파트너 사이트에서 확인
-    $clientCode = '023060000044';
+    $clientCode = '023070000014';
 
     // 출금동의 요청시 반환된 접수아이디
-    $receiptID = '02308220230600000440000000000024';
+    $receiptID = '02308220230700000140000000000024';
 
     try {
       $result = $this->PasscertService->getCMSStatus($clientCode, $receiptID);
@@ -386,10 +386,10 @@ class PasscertController extends Controller
   public function VerifyCMS(){
 
     // 이용기관코드, 파트너 사이트에서 확인
-    $clientCode = '023060000044';
+    $clientCode = '023070000014';
 
     // 출금동의 요청시 반환된 접수아이디
-    $receiptID = '02308220230600000440000000000024';
+    $receiptID = '02308220230700000140000000000024';
 
     // 출금동의 검증 요청정보 객체
     $PassCMSVerify = new PassCMSVerify();
@@ -416,7 +416,7 @@ class PasscertController extends Controller
   public function RequestLogin(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023060000044';
+    $clientCode = '023070000014';
 
     // 간편로그인 요청정보 객체
     $PassLogin = new PassLogin();
@@ -475,10 +475,10 @@ class PasscertController extends Controller
   public function GetLoginStatus(){
 
     // 이용기관코드, 파트너가 등록한 이용기관의 코드 (파트너 사이트에서 확인가능)
-    $clientCode = '023060000044';
+    $clientCode = '023070000014';
 
     // 간편로그인 요청시 반환된 접수아이디
-    $receiptID = '02308220230600000440000000000025';
+    $receiptID = '02308220230700000140000000000025';
 
     try {
       $result = $this->PasscertService->getLoginStatus($clientCode, $receiptID);
@@ -501,10 +501,10 @@ class PasscertController extends Controller
   public function VerifyLogin(){
 
     // 이용기관코드, 파트너 사이트에서 확인
-    $clientCode = '023060000044';
+    $clientCode = '023070000014';
 
     // 간편로그인 요청시 반환된 접수아이디
-    $receiptID = '02308220230600000440000000000025';
+    $receiptID = '02308220230700000140000000000025';
 
     // 간편로그인 검증 요청정보 객체
     $PassLoginVerify = new PassLoginVerify();

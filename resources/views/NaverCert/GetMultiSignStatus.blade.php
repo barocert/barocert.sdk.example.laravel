@@ -2,7 +2,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" type="text/css" href="/css/example.css" media="screen"/>
-    <title>Kakaocert SDK PHP Laravel Example.</title>
+    <title>Navercert SDK PHP Laravel Example.</title>
 </head>
 <body>
 <div id="content">
@@ -14,24 +14,7 @@
             <li>접수 아이디 (ReceiptID) : {{ $result->receiptID }}</li>
             <li>이용기관 코드 (ClientCode) : {{ $result->clientCode }}</li>
             <li>상태 (State) : {{ $result->state }}</li>
-            <li>요청 만료시간 (ExpireIn) : {{ $result->expireIn }}</li>
-            <li>이용기관 명 (CallCenterName) : {{ $result->callCenterName }}</li>
-            <li>이용기관 연락처 (CallCenterNum) : {{ $result->callCenterNum }}</li>
-            <li>인증요청 메시지 제목 (ReqTitle) : {{ $result->reqTitle }}</li>
-            <li>복귀 URL (ReturnURL) : {{ $result->returnURL }}</li>
-
-            <?php
-                for ($i = 0; $i < Count($result->tokenTypes); $i++) {
-            ?>
-                <li>원문 유형 (TokenTypes) : {{ $result->tokenTypes[$i] }}</li>
-            <?php
-                }
-            ?>
-
             <li>서명만료일시 (ExpireDT) : {{ $result->expireDT }}</li>
-            <li>앱스킴 (Scheme): {{ $result->scheme }}</li>
-            <li>모바일장비 유형 (DeviceOSType) : {{ $result->deviceOSType }}</li>
-            <li>앱사용유무 (AppUseYN) : {{ $result->appUseYN ? 'true' : 'false'}}</li>
         </ul>
     </fieldset>
 </div>
