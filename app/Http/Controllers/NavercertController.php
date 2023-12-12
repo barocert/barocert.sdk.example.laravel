@@ -386,11 +386,11 @@ class NavercertController extends Controller
     $NaverCMS = new NaverCMS();
 
     // 수신자 휴대폰번호 - 11자 (하이픈 제외)
-    $NaverCMS->receiverHP = $NavercertService->encrypt('01067668440');
+    $NaverCMS->receiverHP = $NavercertService->encrypt('01012341234');
     // 수신자 성명 - 80자
-    $NaverCMS->receiverName = $NavercertService->encrypt('정우석');
+    $NaverCMS->receiverName = $NavercertService->encrypt('홍길동');
     // 수신자 생년월일 - 8자 (yyyyMMdd)
-    $NaverCMS->receiverBirthday = $NavercertService->encrypt('19900911');
+    $NaverCMS->receiverBirthday = $NavercertService->encrypt('19700101');
     
     // 인증요청 메시지 제목
     $NaverCMS->reqTitle = "출금동의 요청 메시지 제목";
