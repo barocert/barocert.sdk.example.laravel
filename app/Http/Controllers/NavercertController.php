@@ -12,6 +12,7 @@ use Linkhub\Barocert\NaverIdentity;
 use Linkhub\Barocert\NaverSign;
 use Linkhub\Barocert\NaverMultiSign;
 use Linkhub\Barocert\NaverMultiSignTokens;
+use Linkhub\Barocert\NaverCMS;
 
 class NavercertController extends Controller
 {
@@ -167,18 +168,17 @@ class NavercertController extends Controller
     // TEXT - 일반 텍스트, HASH - HASH 데이터
     $NaverSign->tokenType = 'TEXT';
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $NaverSign->token = $NavercertService->encrypt('전자서명(단건) 요청 원문');
+    $NaverSign->token = $this->NavercertService->encrypt('전자서명(단건) 요청 원문');
     // 서명 원문 유형
     // $NaverSign->tokenType = 'HASH';
     // 서명 원문 유형이 HASH인 경우, 원문은 SHA-256, Base64 URL Safe No Padding을 사용
-    // $NaverSign->token = $NavercertService->encrypt($NavercertService->sha256_base64url('전자서명(단건) 요청 원문'));
+    // $NaverSign->token = $this->NavercertService->encrypt($NavercertService->sha256_base64url('전자서명(단건) 요청 원문'));
 
     // AppToApp 인증요청 여부
     // true - AppToApp 인증방식, false - 푸시(Push) 인증방식
     $NaverSign->appUseYN = false;
 
-    // AppToApp 인증방식에서 사용
-    // 모바일장비 유형('ANDROID', 'IOS'), 대문자 입력(대소문자 구분)
+    // AppToApp 인증방식에서 사용    // 모바일장비 유형('ANDROID', 'IOS'), 대문자 입력(대소문자 구분)
     // $NaverSign->deviceOSType = 'IOS';
 
     // AppToApp 방식 이용시, 호출할 URL
@@ -283,22 +283,22 @@ class NavercertController extends Controller
     // TEXT - 일반 텍스트, HASH - HASH 데이터
     $NaverMultiSign->tokens[0]->tokenType = 'TEXT'; 
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $NaverMultiSign->tokens[0]->token = $NavercertService->encrypt("전자서명(복수) 요청 원문 1");
+    $NaverMultiSign->tokens[0]->token = $this->NavercertService->encrypt("전자서명(복수) 요청 원문 1");
     // 서명 원문 유형
     // $NaverMultiSign->tokens[0]->tokenType = 'HASH'; 
     // 서명 원문 유형이 HASH인 경우, 원문은 SHA-256, Base64 URL Safe No Padding을 사용
-    // $NaverMultiSign->tokens[0]->token = $NavercertService->encrypt($NavercertService->sha256_base64url("전자서명(복수) 요청 원문 1"));
+    // $NaverMultiSign->tokens[0]->token = $this->NavercertService->encrypt($this->NavercertService->sha256_base64url("전자서명(복수) 요청 원문 1"));
 
     $NaverMultiSign->tokens[] = new NaverMultiSignTokens();
     // 서명 원문 유형
     // TEXT - 일반 텍스트, HASH - HASH 데이터
     $NaverMultiSign->tokens[1]->tokenType = 'TEXT'; 
     // 서명 원문 - 원문 2,800자 까지 입력가능
-    $NaverMultiSign->tokens[1]->token = $NavercertService->encrypt("전자서명(복수) 요청 원문 2");
+    $NaverMultiSign->tokens[1]->token = $this->NavercertService->encrypt("전자서명(복수) 요청 원문 2");
     // 서명 원문 유형
     // $NaverMultiSign->tokens[1]->tokenType = 'HASH'; 
     // 서명 원문 유형이 HASH인 경우, 원문은 SHA-256, Base64 URL Safe No Padding을 사용
-    // $NaverMultiSign->tokens[1]->token = $NavercertService->encrypt($NavercertService->sha256_base64url("전자서명(복수) 요청 원문 2"));
+    // $NaverMultiSign->tokens[1]->token = $this->NavercertService->encrypt($this->NavercertService->sha256_base64url("전자서명(복수) 요청 원문 2"));
 
     // AppToApp 인증요청 여부
     // true - AppToApp 인증방식, false - 푸시(Push) 인증방식
@@ -386,31 +386,31 @@ class NavercertController extends Controller
     $NaverCMS = new NaverCMS();
 
     // 수신자 휴대폰번호 - 11자 (하이픈 제외)
-    $NaverCMS->receiverHP = $NavercertService->encrypt('01012341234');
+    $NaverCMS->receiverHP = $this->NavercertService->encrypt('01012341234');
     // 수신자 성명 - 80자
-    $NaverCMS->receiverName = $NavercertService->encrypt('홍길동');
+    $NaverCMS->receiverName = $this->NavercertService->encrypt('홍길동');
     // 수신자 생년월일 - 8자 (yyyyMMdd)
-    $NaverCMS->receiverBirthday = $NavercertService->encrypt('19700101');
+    $NaverCMS->receiverBirthday = $this->NavercertService->encrypt('19700101');
     
     // 인증요청 메시지 제목
     $NaverCMS->reqTitle = "출금동의 요청 메시지 제목";
     // 인증요청 메시지
-    $NaverCMS->reqMessage = $NavercertService->encrypt("출금동의 요청 메시지");
+    $NaverCMS->reqMessage = $this->NavercertService->encrypt("출금동의 요청 메시지");
     // 고객센터 연락처 - 최대 12자
     $NaverCMS->callCenterNum = '1600-9854';
     // 인증요청 만료시간 - 최대 1,000(초)까지 입력 가능
     $NaverCMS->expireIn = 1000;
 
     // 청구기관명
-    $NaverCMS->requestCorp = $NavercertService->encrypt("청구기관");
+    $NaverCMS->requestCorp = $this->NavercertService->encrypt("청구기관");
     // 출금은행명
-    $NaverCMS->bankName = $NavercertService->encrypt("출금은행");
+    $NaverCMS->bankName = $this->NavercertService->encrypt("출금은행");
     // 출금계좌번호
-    $NaverCMS->bankAccountNum = $NavercertService->encrypt("123-456-7890");
+    $NaverCMS->bankAccountNum = $this->NavercertService->encrypt("123-456-7890");
     // 출금계좌 예금주명
-    $NaverCMS->bankAccountName = $NavercertService->encrypt("홍길동");
+    $NaverCMS->bankAccountName = $this->NavercertService->encrypt("홍길동");
     // 출금계좌 예금주 생년월일
-    $NaverCMS->bankAccountBirthday = $NavercertService->encrypt("19700101");
+    $NaverCMS->bankAccountBirthday = $this->NavercertService->encrypt("19700101");
 
     // AppToApp 인증요청 여부
     // true - AppToApp 인증방식, false - 푸시(Push) 인증방식
