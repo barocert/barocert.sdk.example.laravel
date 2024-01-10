@@ -49,10 +49,11 @@ class KakaocertController extends Controller
     // 본인인증 요청정보 객체
     $KakaoIdentity = new KakaoIdentity();
 
-    // 수신자 정보
-    // 휴대폰번호, 성명, 생년월일 
+    // 수신자 휴대폰번호 - 11자 (하이픈 제외)
     $KakaoIdentity->receiverHP = $this->KakaocertService->encrypt('01012341234');
+    // 수신자 성명 - 80자
     $KakaoIdentity->receiverName = $this->KakaocertService->encrypt('홍길동');
+    // 수신자 생년월일 - 8자 (yyyyMMdd)
     $KakaoIdentity->receiverBirthday = $this->KakaocertService->encrypt('19700101');
     
     // 인증요청 메시지 제목 - 최대 40자
@@ -146,10 +147,11 @@ class KakaocertController extends Controller
     // 전자서명 요청정보 객체
     $KakaoSign = new KakaoSign();
 
-    // 수신자 정보
-    // 휴대폰번호, 성명, 생년월일
+    // 수신자 휴대폰번호 - 11자 (하이픈 제외)
     $KakaoSign->receiverHP = $this->KakaocertService->encrypt('01012341234');
+    // 수신자 성명 - 80자
     $KakaoSign->receiverName = $this->KakaocertService->encrypt('홍길동');
+    // 수신자 생년월일 - 8자 (yyyyMMdd)
     $KakaoSign->receiverBirthday = $this->KakaocertService->encrypt('19700101');
 
     // 인증요청 메시지 제목 - 최대 40자
@@ -245,10 +247,11 @@ class KakaocertController extends Controller
     // 전자서명 요청정보 객체
     $KakaoMultiSign = new KakaoMultiSign();
 
-    // 수신자 정보
-    // 휴대폰번호, 성명, 생년월일
+    // 수신자 휴대폰번호 - 11자 (하이픈 제외)
     $KakaoMultiSign->receiverHP = $this->KakaocertService->encrypt('01012341234');
+    // 수신자 성명 - 80자
     $KakaoMultiSign->receiverName = $this->KakaocertService->encrypt('홍길동');
+    // 수신자 생년월일 - 8자 (yyyyMMdd)
     $KakaoMultiSign->receiverBirthday = $this->KakaocertService->encrypt('19700101');
 
     // 인증요청 메시지 제목 - 최대 40자
@@ -359,10 +362,11 @@ class KakaocertController extends Controller
       // 출금동의 요청 정보 객체
       $KakaoCMS = new KakaoCMS();
 
-      // 수신자 정보
-      // 휴대폰번호, 성명, 생년월일
+      // 수신자 휴대폰번호 - 11자 (하이픈 제외)
       $KakaoCMS->receiverHP = $this->KakaocertService->encrypt('01012341234');
+      // 수신자 성명 - 80자
       $KakaoCMS->receiverName = $this->KakaocertService->encrypt('홍길동');
+      // 수신자 생년월일 - 8자 (yyyyMMdd)
       $KakaoCMS->receiverBirthday = $this->KakaocertService->encrypt('19700101');
 
       // 인증요청 메시지 제목 - 최대 40자
