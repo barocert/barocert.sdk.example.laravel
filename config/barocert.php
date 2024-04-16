@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Barocert API PHP SDK JSP Example
+ * Barocert API PHP SDK Laravel Example
  *
  * 업데이트 일자 : 2024-04-16
  * 연동기술지원 연락처 : 1600-9854
