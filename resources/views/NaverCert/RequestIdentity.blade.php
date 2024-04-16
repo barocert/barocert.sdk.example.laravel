@@ -2,7 +2,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" type="text/css" href="/css/example.css" media="screen"/>
-    <title>Navercert SDK PHP Laravel Example.</title>
+    <title>Barocert Laravel Example</title>
 </head>
 <body>
 <div id="content">

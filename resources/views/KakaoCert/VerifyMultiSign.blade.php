@@ -2,7 +2,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" type="text/css" href="/css/example.css" media="screen"/>
-    <title>Kakaocert SDK PHP Laravel Example.</title>
+    <title>Barocert Laravel Example</title>
 </head>
 <body>
 <div id="content">
@@ -21,6 +21,10 @@
                 }
             ?>
             <li>연계정보 (Ci) : {{ $result->ci }}</li>
+            <li>수신자 성명 (ReceiverName) : {{ $result->receiverName }}</li>
+            <li>수신자 출생년도 (ReceiverYear) : {{ $result->receiverYear }}</li>
+            <li>수신자 출생월일 (ReceiverDay) : {{ $result->receiverDay }}</li>
+            <li>수신자 휴대폰번호 (ReceiverHP) : {{ $result->receiverHP }}</li>
         </ul>
     </fieldset>
 </div>
