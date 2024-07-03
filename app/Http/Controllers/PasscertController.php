@@ -184,12 +184,18 @@ class PasscertController extends Controller
     $PassSign->callCenterNum = '1600-9854';
     // 요청 만료시간 - 최대 1,000(초)까지 입력 가능
     $PassSign->expireIn = 1000;
-    // 서명 원문 - 원문 2,800자 까지 입력가능
-    $PassSign->token = $this->PasscertService->encrypt('전자서명 요청 원문');
     // 서명 원문 유형
-    // 'TEXT' - 일반 텍스트, 'HASH' - HASH 데이터, 'URL' - URL 데이터
+    // 'TEXT' - 일반 텍스트, 'HASH' - HASH 데이터, 'URL' - URL 데이터, PDF - PDF 데이터
     // 원본데이터(originalTypeCode, originalURL, originalFormatCode) 입력시 'TEXT'사용 불가
     $PassSign->tokenType = 'URL';
+    // 서명 원문 - 원문 2,800자 까지 입력가능
+    $PassSign->token = $this->PasscertService->encrypt('전자서명 요청 원문');
+
+    // 서명 원문 유형
+    // $PassSign->tokenType = 'PDF';
+    // $target = file_get_contents(base_path().'/barocert.pdf');
+    // 서명 원문 유형이 PDF 경우, 원문은 SHA-256, Base64 URL Safe No Padding을 사용
+    // $PassSign->token = $this->PasscertService->encrypt($this->PasscertService->sha256_base64url_file($target));
 
     // 사용자 동의 필요 여부
     $PassSign->userAgreementYN = true;
