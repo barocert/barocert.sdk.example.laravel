@@ -26,6 +26,8 @@
             <li>수신자 출생월일 (ReceiverDay) : {{ $result->receiverDay }}</li>
             <li>수신자 휴대폰번호 (ReceiverHP) : {{ $result->receiverHP }}</li>
             <li>수신자 성별 (ReceiverGender) : {{ $result->receiverGender }}</li>
+            <li>외국인 여부 (receiverForeign) : {{ $result->receiverForeign }}</li>
+            <li>통신사 유형 (receiverTelcoType) : {{ $result->receiverTelcoType }}</li>
         </ul>
     </fieldset>
 </div>
